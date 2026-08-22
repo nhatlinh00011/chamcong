@@ -1,884 +1,181 @@
-import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const ChamCongApp());
-}
-
-class ChamCongApp extends StatelessWidget {
-  const ChamCongApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Chấm Công',
-      theme: ThemeData(
-        useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFFF6F6F6),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFFFC107),
-        ),
-      ),
-      home: const MainScreen(),
-    );
-  }
-}
-
-// =====================================================
-// MAIN SCREEN
-// =====================================================
-
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
-
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  int selectedIndex = 0;
-
-  final List<Widget> screens = const [
-    HomeScreen(),
-    CalendarScreen(),
-    StatisticsScreen(),
-    ProfileScreen(),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: screens[selectedIndex],
-
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            selectedIndex = index;
-          });
-        },
-        indicatorColor: const Color(0xFFFFD54F),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Trang chủ',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.calendar_month_outlined),
-            selectedIcon: Icon(Icons.calendar_month),
-            label: 'Lịch',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.bar_chart_outlined),
-            selectedIcon: Icon(Icons.bar_chart),
-            label: 'Thống kê',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Cá nhân',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// =====================================================
-// HOME
-// =====================================================
-
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  bool checkedIn = false;
-  String checkInTime = '--:--';
-  String checkOutTime = '--:--';
-
-  String getCurrentTime() {
-    final now = DateTime.now();
-
-    return '${now.hour.toString().padLeft(2, '0')}:'
-        '${now.minute.toString().padLeft(2, '0')}';
-  }
-
-  void attendance() {
-    setState(() {
-      if (!checkedIn) {
-        checkedIn = true;
-        checkInTime = getCurrentTime();
-      } else {
-        checkOutTime = getCurrentTime();
-      }
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          checkedIn && checkOutTime == '--:--'
-              ? 'Đã chấm công vào lúc $checkInTime'
-              : 'Đã chấm công ra lúc $checkOutTime',
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final now = DateTime.now();
-
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-
-            // HEADER
-            Row(
-              children: [
-                const CircleAvatar(
-                  radius: 27,
-                  backgroundColor: Color(0xFFFFD54F),
-                  child: Icon(
-                    Icons.person,
-                    color: Colors.black,
-                    size: 30,
-                  ),
-                ),
-
-                const SizedBox(width: 12),
-
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Xin chào 👋',
-                      style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 14,
-                      ),
-                    ),
-                    Text(
-                      'Đức Giang',
-                      style: TextStyle(
-                        fontSize: 21,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const Spacer(),
-
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(
-                    Icons.notifications_none,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 30),
-
-            Text(
-              '${now.day.toString().padLeft(2, '0')}/'
-              '${now.month.toString().padLeft(2, '0')}/'
-              '${now.year}',
-              style: const TextStyle(
-                color: Colors.grey,
-              ),
-            ),
-
-            const Text(
-              'Hôm nay',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // ATTENDANCE CARD
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(25),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(25),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(.05),
-                    blurRadius: 15,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 15,
-                      vertical: 8,
-                    ),
-                    decoration: BoxDecoration(
-                      color: checkedIn
-                          ? Colors.green.withOpacity(.12)
-                          : Colors.orange.withOpacity(.12),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.circle,
-                          size: 10,
-                          color: checkedIn
-                              ? Colors.green
-                              : Colors.orange,
-                        ),
-                        const SizedBox(width: 7),
-                        Text(
-                          checkedIn
-                              ? 'Đang trong ca'
-                              : 'Chưa chấm công',
-                          style: TextStyle(
-                            color: checkedIn
-                                ? Colors.green
-                                : Colors.orange,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  Icon(
-                    Icons.fingerprint,
-                    size: 80,
-                    color: checkedIn
-                        ? Colors.green
-                        : const Color(0xFFFFC107),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  const Text(
-                    'Ca làm việc',
-                    style: TextStyle(
-                      color: Colors.grey,
-                    ),
-                  ),
-
-                  const SizedBox(height: 5),
-
-                  const Text(
-                    '08:00 - 17:30',
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton.icon(
-                      onPressed:
-                          checkOutTime == '--:--'
-                              ? attendance
-                              : null,
-                      icon: Icon(
-                        checkedIn
-                            ? Icons.logout
-                            : Icons.fingerprint,
-                      ),
-                      label: Text(
-                        checkedIn
-                            ? 'CHẤM CÔNG RA'
-                            : 'CHẤM CÔNG VÀO',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            const Color(0xFFFFC107),
-                        foregroundColor: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(16),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 18),
-
-            // INFO
-            Row(
-              children: [
-                Expanded(
-                  child: InfoCard(
-                    icon: Icons.login,
-                    title: 'Giờ vào',
-                    value: checkInTime,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: InfoCard(
-                    icon: Icons.logout,
-                    title: 'Giờ ra',
-                    value: checkOutTime,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 12),
-
-            Row(
-              children: const [
-                Expanded(
-                  child: InfoCard(
-                    icon: Icons.access_time,
-                    title: 'Tổng giờ',
-                    value: '0h 00m',
-                  ),
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: InfoCard(
-                    icon: Icons.event_available,
-                    title: 'Ngày công',
-                    value: '22 ngày',
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 28),
-
-            const Text(
-              'Hoạt động gần đây',
-              style: TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            ActivityItem(
-              icon: Icons.login,
-              title: 'Chấm công vào',
-              time: checkInTime == '--:--'
-                  ? 'Chưa chấm công'
-                  : checkInTime,
-            ),
-
-            ActivityItem(
-              icon: Icons.logout,
-              title: 'Chấm công ra',
-              time: checkOutTime,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// =====================================================
-// INFO CARD
-// =====================================================
-
-class InfoCard extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String value;
-
-  const InfoCard({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(17),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            icon,
-            color: const Color(0xFFFFB300),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.grey,
-              fontSize: 13,
-            ),
-          ),
-          const SizedBox(height: 3),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// =====================================================
-// ACTIVITY
-// =====================================================
-
-class ActivityItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String time;
-
-  const ActivityItem({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.time,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor:
-                const Color(0xFFFFF3CD),
-            child: Icon(
-              icon,
-              color: Colors.orange,
-            ),
-          ),
-
-          const SizedBox(width: 12),
-
-          Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                time,
-                style: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: 13,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// =====================================================
-// CALENDAR
-// =====================================================
-
-class CalendarScreen extends StatelessWidget {
-  const CalendarScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
-          children: [
-
-            const Text(
-              'Lịch chấm công',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius:
-                    BorderRadius.circular(20),
-              ),
-              child: Column(
-                children: [
-
-                  const Text(
-                    'Tháng 8 / 2026',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics:
-                        const NeverScrollableScrollPhysics(),
-                    itemCount: 31,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 7,
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 8,
-                    ),
-                    itemBuilder:
-                        (context, index) {
-
-                      final day = index + 1;
-
-                      return Container(
-                        alignment:
-                            Alignment.center,
-                        decoration:
-                            BoxDecoration(
-                          color: day < 23
-                              ? Colors.green
-                                  .withOpacity(.12)
-                              : Colors.grey
-                                  .withOpacity(.08),
-                          borderRadius:
-                              BorderRadius.circular(
-                                  10),
-                        ),
-                        child: Text(
-                          '$day',
-                          style: TextStyle(
-                            fontWeight:
-                                FontWeight.w600,
-                            color: day < 23
-                                ? Colors.green
-                                : Colors.grey,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// =====================================================
-// STATISTICS
-// =====================================================
-
-class StatisticsScreen extends StatelessWidget {
-  const StatisticsScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
-          children: [
-
-            const Text(
-              'Thống kê',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            StatBox(
-              icon: Icons.calendar_today,
-              title: 'Ngày công',
-              value: '22',
-            ),
-
-            StatBox(
-              icon: Icons.access_time,
-              title: 'Tổng giờ làm',
-              value: '176h',
-            ),
-
-            StatBox(
-              icon: Icons.warning_amber,
-              title: 'Đi muộn',
-              value: '2 lần',
-            ),
-
-            StatBox(
-              icon: Icons.event_busy,
-              title: 'Nghỉ phép',
-              value: '1 ngày',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class StatBox extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String value;
-
-  const StatBox({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin:
-          const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-
-          Container(
-            padding:
-                const EdgeInsets.all(13),
-            decoration: BoxDecoration(
-              color:
-                  const Color(0xFFFFF3CD),
-              borderRadius:
-                  BorderRadius.circular(14),
-            ),
-            child: Icon(
-              icon,
-              color: Colors.orange,
-            ),
-          ),
-
-          const SizedBox(width: 15),
-
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                color: Colors.grey,
-              ),
-            ),
-          ),
-
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 21,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// =====================================================
-// PROFILE
-// =====================================================
-
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-
-            const SizedBox(height: 20),
-
-            const CircleAvatar(
-              radius: 45,
-              backgroundColor:
-                  Color(0xFFFFD54F),
-              child: Icon(
-                Icons.person,
-                size: 50,
-                color: Colors.black,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            const Text(
-              'Đức Giang',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const Text(
-              'Nhân viên',
-              style: TextStyle(
-                color: Colors.grey,
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            ProfileItem(
-              icon: Icons.badge_outlined,
-              title: 'Mã nhân viên',
-              value: 'NV001',
-            ),
-
-            ProfileItem(
-              icon: Icons.business_outlined,
-              title: 'Bộ phận',
-              value: 'Nội thất',
-            ),
-
-            ProfileItem(
-              icon: Icons.schedule,
-              title: 'Ca làm việc',
-              value: '08:00 - 17:30',
-            ),
-
-            const SizedBox(height: 15),
-
-            ListTile(
-              leading:
-                  const Icon(Icons.settings_outlined),
-              title:
-                  const Text('Cài đặt'),
-              trailing:
-                  const Icon(Icons.chevron_right),
-              onTap: () {},
-            ),
-
-            ListTile(
-              leading:
-                  const Icon(Icons.lock_outline),
-              title:
-                  const Text('Đổi mật khẩu'),
-              trailing:
-                  const Icon(Icons.chevron_right),
-              onTap: () {},
-            ),
-
-            ListTile(
-              leading:
-                  const Icon(Icons.logout),
-              title:
-                  const Text('Đăng xuất'),
-              onTap: () {},
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ProfileItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String value;
-
-  const ProfileItem({
-    super.key,
-    required this.icon,
-    required this.title,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Icon(icon),
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: Colors.grey,
-          fontSize: 13,
-        ),
-      ),
-      subtitle: Text(
-        value,
-        style: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <meta name="theme-color"
+        content="#FFC107">
+
+  <title>Chấm Công</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+
+    <div class="user">
+      <div class="avatar">ĐG</div>
+
+      <div>
+        <span>Xin chào 👋</span>
+        <h2>Đức Giang</h2>
+      </div>
+    </div>
+
+    <button class="notification">
+      🔔
+    </button>
+
+  </header>
+
+
+  <!-- CONTENT -->
+  <main>
+
+    <div class="date" id="currentDate"></div>
+
+    <h1>Hôm nay</h1>
+
+
+    <!-- ATTENDANCE CARD -->
+    <section class="attendance-card">
+
+      <div class="status" id="status">
+        <span></span>
+        Chưa chấm công
+      </div>
+
+      <div class="fingerprint">
+        👆
+      </div>
+
+      <p class="shift-title">
+        Ca làm việc
+      </p>
+
+      <div class="shift">
+        08:00 - 17:30
+      </div>
+
+
+      <button
+        class="attendance-btn"
+        id="attendanceBtn"
+        onclick="attendance()">
+
+        👆 CHẤM CÔNG VÀO
+
+      </button>
+
+    </section>
+
+
+    <!-- INFO -->
+    <div class="info-grid">
+
+      <div class="info-card">
+        <div class="icon">↪</div>
+        <span>Giờ vào</span>
+        <strong id="checkIn">--:--</strong>
+      </div>
+
+      <div class="info-card">
+        <div class="icon">↩</div>
+        <span>Giờ ra</span>
+        <strong id="checkOut">--:--</strong>
+      </div>
+
+      <div class="info-card">
+        <div class="icon">⏱</div>
+        <span>Tổng giờ</span>
+        <strong id="totalTime">0h 00m</strong>
+      </div>
+
+      <div class="info-card">
+        <div class="icon">📅</div>
+        <span>Ngày công</span>
+        <strong>22 ngày</strong>
+      </div>
+
+    </div>
+
+
+    <!-- RECENT -->
+    <section class="recent">
+
+      <h3>Hoạt động gần đây</h3>
+
+      <div class="activity">
+
+        <div class="activity-icon">
+          ↪
+        </div>
+
+        <div>
+          <strong>Chấm công vào</strong>
+          <span id="recentIn">
+            Chưa chấm công
+          </span>
+        </div>
+
+      </div>
+
+
+      <div class="activity">
+
+        <div class="activity-icon">
+          ↩
+        </div>
+
+        <div>
+          <strong>Chấm công ra</strong>
+          <span id="recentOut">
+            Chưa chấm công
+          </span>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+
+    <button class="active">
+      🏠
+      <span>Trang chủ</span>
+    </button>
+
+    <button onclick="showMessage('Lịch chấm công')">
+      📅
+      <span>Lịch</span>
+    </button>
+
+    <button onclick="showMessage('Thống kê')">
+      📊
+      <span>Thống kê</span>
+    </button>
+
+    <button onclick="showMessage('Cá nhân')">
+      👤
+      <span>Cá nhân</span>
+    </button>
+
+  </nav>
+
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
