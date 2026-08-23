@@ -419,20 +419,27 @@ button{
     background:#8bc653;
 }
 
-.day.half{
-    background:linear-gradient(
-        135deg,
-        #8bc653 0%,
-        #8bc653 50%,
-        #c9c5c6 50%,
-        #c9c5c6 100%
-    );
+/* Ngày đã chấm công */
+.day.checked{
+    background:#42a5f5;
 }
 
+/* Giữ class cũ để tương thích dữ liệu */
+.day.half{
+    background:#42a5f5;
+}
+
+/* Thứ 7 */
 .day.off{
     background:#c9c5c6;
 }
 
+/* Chủ nhật */
+.day.sunday{
+    background:#ef5350;
+}
+
+/* Hôm nay khi chưa chấm */
 .day.today{
     background:#625f7e;
 }
@@ -1451,49 +1458,57 @@ function renderCalendar(){
         div.className="day";
 
 
-        if(record){
+        const date =
+            new Date(
+                currentYear,
+                currentMonth,
+                day
+            );
 
-            if(record.status === 0.5){
-                div.classList.add("half");
-            }else{
-                div.classList.add("work");
-            }
+        const isSunday =
+            date.getDay() === 0;
+
+        const isSaturday =
+            date.getDay() === 6;
+
+        const isToday =
+            today.getDate() === day
+            &&
+            today.getMonth() === currentMonth
+            &&
+            today.getFullYear() === currentYear;
+
+
+        /*
+         * Thứ tự ưu tiên:
+         * 1. Chủ nhật luôn màu đỏ
+         * 2. Ngày đã chấm công màu xanh da trời
+         * 3. Thứ 7 màu xám
+         * 4. Ngày thường chưa chấm màu xanh lá
+         * 5. Hôm nay chưa chấm có màu tím
+         */
+
+        if(isSunday){
+
+            div.classList.add("sunday");
+
+        }else if(record){
+
+            div.classList.add("checked");
+
+        }else if(isSaturday){
+
+            div.classList.add("off");
 
         }else{
 
-            const date =
-                new Date(
-                    currentYear,
-                    currentMonth,
-                    day
-                );
-
-            if(
-                date.getDay()===0
-                ||
-                date.getDay()===6
-            ){
-
-                div.classList.add("off");
-
-            }else{
-
-                div.classList.add("work");
-
-            }
+            div.classList.add("work");
 
         }
 
 
-        if(
-            today.getDate()===day
-            &&
-            today.getMonth()===currentMonth
-            &&
-            today.getFullYear()===currentYear
-        ){
+        if(isToday && !record && !isSunday){
 
-            div.classList.remove("work");
             div.classList.add("today");
 
         }
