@@ -444,6 +444,69 @@ button{
     white-space:nowrap;
 }
 
+
+.month-stats{
+    margin-top:20px;
+    background:white;
+    border-radius:22px;
+    padding:8px 18px;
+    box-shadow:0 8px 24px rgba(35,31,95,.06);
+}
+
+.month-stat-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 24px;
+    min-height:58px;
+    align-items:center;
+    border-bottom:1px dashed #e3e3e3;
+}
+
+.month-stat-row:last-child{
+    border-bottom:0;
+}
+
+.month-stat-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    min-width:0;
+}
+
+.month-stat-label{
+    color:#29235f;
+    font-size:15px;
+}
+
+.month-stat-value{
+    color:#29235f;
+    font-weight:700;
+    font-size:15px;
+    white-space:nowrap;
+}
+
+.month-stat-value.money{
+    color:#2670ff;
+}
+
+@media(max-width:480px){
+    .month-stats{
+        padding:6px 14px;
+        border-radius:18px;
+    }
+
+    .month-stat-row{
+        gap:0 12px;
+        min-height:54px;
+    }
+
+    .month-stat-label,
+    .month-stat-value{
+        font-size:13px;
+    }
+}
+
 .calendar-detail{
     color:#2670ff;
     text-decoration:underline;
@@ -880,6 +943,37 @@ button{
 .work-option-full{
     grid-column:1 / -1;
     min-height:92px;
+}
+
+.special-work-options{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    grid-column:1 / -1;
+}
+
+.special-work-option{
+    min-height:104px;
+    padding:14px 8px;
+    font-size:14px;
+}
+
+.special-work-option .work-icon{
+    width:42px;
+    height:42px;
+    font-size:21px;
+}
+
+@media(max-width:480px){
+    .special-work-option{
+        font-size:13px;
+        min-height:98px;
+    }
+
+    .special-work-option .work-icon{
+        width:40px;
+        height:40px;
+    }
 }
 
 .work-icon{
@@ -1559,6 +1653,11 @@ button{
                 class="calendar-grid">
             </div>
 
+            <div
+                id="monthStats"
+                class="month-stats">
+            </div>
+
         </div>
 
     </div>
@@ -1815,6 +1914,8 @@ function createBoard(){
 
         paid:0,
 
+        transactions:[],
+
         attendance:{}
 
     };
@@ -2049,6 +2150,8 @@ function renderCalendar(){
 
     }
 
+    updateMonthStats();
+
 }
 
 
@@ -2091,7 +2194,11 @@ function openDay(day){
                     ? 1
                     : oldRecord.status === 2
                         ? 2
-                        : 0,
+                        : oldRecord.status === 3
+                            ? 3
+                            : oldRecord.status === 4
+                                ? 4
+                                : 0,
 
         overtimeHours:
             Number(oldRecord.overtimeHours) || 0,
@@ -2191,10 +2298,13 @@ function openDay(day){
 
             </button>
 
+        </div>
+
+        <div class="special-work-options">
+
             <button
                 type="button"
-                class="work-option work-option-full"
-                style="${record.status === 2 ? "border-color:#6847ff;background:#eeeaff;color:#6847ff;" : ""}"
+                class="work-option special-work-option ${record.status === 2 ? "selected" : ""}"
                 onclick="selectWorkType(2); return false;">
 
                 <div class="work-icon">
@@ -2202,7 +2312,37 @@ function openDay(day){
                 </div>
 
                 <strong>
-                    Tăng ca cuối tuần/ngày
+                    Tăng ca<br>cuối tuần/ngày
+                </strong>
+
+            </button>
+
+            <button
+                type="button"
+                class="work-option special-work-option ${record.status === 3 ? "selected" : ""}"
+                onclick="selectWorkType(3); return false;">
+
+                <div class="work-icon">
+                    ✓
+                </div>
+
+                <strong>
+                    Nghỉ<br>có lương
+                </strong>
+
+            </button>
+
+            <button
+                type="button"
+                class="work-option special-work-option ${record.status === 4 ? "selected" : ""}"
+                onclick="selectWorkType(4); return false;">
+
+                <div class="work-icon">
+                    ×
+                </div>
+
+                <strong>
+                    Nghỉ<br>không lương
                 </strong>
 
             </button>
@@ -2356,6 +2496,36 @@ function selectWorkType(type){
 
     if(type === 2 && buttons[2]){
         buttons[2].classList.add("selected");
+    }
+
+    if(type === 3){
+        document
+            .querySelectorAll(".special-work-option")[1]
+            ?.classList.add("selected");
+
+        const hoursInput =
+            document.getElementById("selectedOvertimeHours");
+
+        if(hoursInput){
+            hoursInput.value = "0";
+        }
+
+        refreshOvertimeSummary();
+    }
+
+    if(type === 4){
+        document
+            .querySelectorAll(".special-work-option")[2]
+            ?.classList.add("selected");
+
+        const hoursInput =
+            document.getElementById("selectedOvertimeHours");
+
+        if(hoursInput){
+            hoursInput.value = "0";
+        }
+
+        refreshOvertimeSummary();
     }
 
 }
@@ -2590,18 +2760,30 @@ function saveAttendance(key){
             "attendanceNote"
         ).value.trim();
 
-    if(type !== 0.5 && type !== 1 && type !== 2){
+    if(
+        type !== 0.5
+        && type !== 1
+        && type !== 2
+        && type !== 3
+        && type !== 4
+    ){
 
         alert(
-            "Vui lòng chọn 1/2 công, cả ngày hoặc tăng ca cuối tuần/ngày."
+            "Vui lòng chọn một trong các hình thức chấm công."
         );
 
         return;
     }
 
+    // Nghỉ có lương / nghỉ không lương không phát sinh tăng ca.
+    const finalOvertimeHours =
+        (type === 3 || type === 4)
+            ? 0
+            : overtimeHours;
+
     currentBoard.attendance[key] = {
         status:type,
-        overtimeHours:overtimeHours,
+        overtimeHours:finalOvertimeHours,
         overtimeRate:overtimeRate,
         note:note
     };
@@ -2662,7 +2844,25 @@ function openSalaryDetail(){
         const overtimeHours =
             Number(record.overtimeHours) || 0;
 
-        if(status !== 0.5 && status !== 1 && overtimeHours <= 0){
+        const isPaidLeave =
+            status === 3
+            || status === "paidLeave"
+            || status === "paid_leave"
+            || status === "nghi_co_luong";
+
+        const isUnpaidLeave =
+            status === 4
+            || status === "unpaidLeave"
+            || status === "unpaid_leave"
+            || status === "nghi_khong_luong";
+
+        if(
+            status !== 0.5
+            && status !== 1
+            && !isPaidLeave
+            && !isUnpaidLeave
+            && overtimeHours <= 0
+        ){
             return;
         }
 
@@ -3086,6 +3286,262 @@ function updateSummary(){
 }
 
 
+
+/* =========================================
+   MONTHLY CALENDAR STATISTICS
+========================================= */
+
+function updateMonthStats(){
+
+    const box =
+        document.getElementById("monthStats");
+
+    if(!box || !currentBoard){
+        return;
+    }
+
+    const monthPrefix =
+        `${currentYear}-${String(currentMonth+1).padStart(2,"0")}-`;
+
+    const attendance =
+        currentBoard.attendance || {};
+
+    let totalWorkDays = 0;
+    let totalOvertimeHours = 0;
+    let paidLeave = 0;
+    let unpaidLeave = 0;
+
+    Object.entries(attendance).forEach(([date, record]) => {
+
+        if(!date.startsWith(monthPrefix)){
+            return;
+        }
+
+        const status =
+            record?.status;
+
+        if(status === 1 || Number(status) === 1){
+            totalWorkDays += 1;
+        }else if(status === 0.5 || Number(status) === 0.5){
+            totalWorkDays += 0.5;
+        }else if(
+            status === 3
+            || status === "3"
+            || status === "paidLeave"
+            || status === "paid_leave"
+            || status === "nghi_co_luong"
+        ){
+            paidLeave += 1;
+        }else if(
+            status === 4
+            || status === "4"
+            || status === "unpaidLeave"
+            || status === "unpaid_leave"
+            || status === "nghi_khong_luong"
+        ){
+            unpaidLeave += 1;
+        }
+
+        totalOvertimeHours +=
+            Math.max(
+                0,
+                Number(record?.overtimeHours) || 0
+            );
+    });
+
+    /*
+     * Ngày chưa chấm = các ngày làm việc T2-T6
+     * đã đến ngày hiện tại nhưng chưa có bản ghi chấm công.
+     * Thứ 7/CN không tính vào ngày chưa chấm.
+     */
+    const today = new Date();
+    let unmarkedDays = 0;
+
+    const daysInMonth =
+        new Date(
+            currentYear,
+            currentMonth + 1,
+            0
+        ).getDate();
+
+    for(let day=1; day<=daysInMonth; day++){
+
+        const date =
+            new Date(
+                currentYear,
+                currentMonth,
+                day
+            );
+
+        const weekday =
+            date.getDay();
+
+        if(weekday === 0 || weekday === 6){
+            continue;
+        }
+
+        const isFuture =
+            date >
+            new Date(
+                today.getFullYear(),
+                today.getMonth(),
+                today.getDate()
+            );
+
+        if(isFuture){
+            continue;
+        }
+
+        const key =
+            dateKey(
+                currentYear,
+                currentMonth,
+                day
+            );
+
+        if(!attendance[key]){
+            unmarkedDays += 1;
+        }
+    }
+
+    let advance = 0;
+    let deduct = 0;
+    let allowance = 0;
+
+    const transactions =
+        Array.isArray(currentBoard.transactions)
+            ? currentBoard.transactions
+            : [];
+
+    transactions.forEach(item => {
+
+        if(!String(item.date || "").startsWith(monthPrefix)){
+            return;
+        }
+
+        const amount =
+            Number(item.amount) || 0;
+
+        if(item.type === "Ứng lương"){
+            advance += amount;
+        }
+
+        if(item.type === "Trừ tiền"){
+            deduct += amount;
+        }
+
+        if(item.type === "Phụ cấp"){
+            allowance += amount;
+        }
+
+    });
+
+    box.innerHTML = `
+
+        <div class="month-stat-row">
+
+            <div class="month-stat-item">
+                <span class="month-stat-label">
+                    Tổng ngày làm:
+                </span>
+                <strong class="month-stat-value">
+                    ${formatWorkDays(totalWorkDays)}
+                </strong>
+            </div>
+
+            <div class="month-stat-item">
+                <span class="month-stat-label">
+                    Số ngày chưa chấm:
+                </span>
+                <strong class="month-stat-value">
+                    ${unmarkedDays} ngày
+                </strong>
+            </div>
+
+        </div>
+
+        <div class="month-stat-row">
+
+            <div class="month-stat-item">
+                <span class="month-stat-label">
+                    Tổng giờ tăng ca:
+                </span>
+                <strong class="month-stat-value">
+                    ${formatHours(totalOvertimeHours)}
+                </strong>
+            </div>
+
+            <div class="month-stat-item">
+                <span class="month-stat-label">
+                    Tổng ứng:
+                </span>
+                <strong class="month-stat-value money">
+                    ${money(advance)}
+                </strong>
+            </div>
+
+        </div>
+
+        <div class="month-stat-row">
+
+            <div class="month-stat-item">
+                <span class="month-stat-label">
+                    Nghỉ có lương:
+                </span>
+                <strong class="month-stat-value">
+                    ${formatWorkDays(paidLeave)}
+                </strong>
+            </div>
+
+            <div class="month-stat-item">
+                <span class="month-stat-label">
+                    Tổng trừ tiền:
+                </span>
+                <strong class="month-stat-value money">
+                    ${money(deduct)}
+                </strong>
+            </div>
+
+        </div>
+
+        <div class="month-stat-row">
+
+            <div class="month-stat-item">
+                <span class="month-stat-label">
+                    Nghỉ không lương:
+                </span>
+                <strong class="month-stat-value">
+                    ${formatWorkDays(unpaidLeave)}
+                </strong>
+            </div>
+
+            <div class="month-stat-item">
+                <span class="month-stat-label">
+                    Phụ cấp:
+                </span>
+                <strong class="month-stat-value money">
+                    ${money(allowance)}
+                </strong>
+            </div>
+
+        </div>
+
+    `;
+}
+
+
+function formatWorkDays(value){
+
+    const n = Number(value) || 0;
+
+    if(Number.isInteger(n)){
+        return `${n} ngày`;
+    }
+
+    return `${String(n).replace(".", ",")} ngày`;
+}
+
+
 /* =========================================
    MONEY
 ========================================= */
@@ -3461,33 +3917,63 @@ function saveAppendix(type){
             ).value
         ) || 0;
 
+    const note =
+        document.getElementById(
+            "noteInput"
+        )?.value.trim() || "";
+
+    if(amount <= 0){
+        alert("Vui lòng nhập số tiền lớn hơn 0.");
+        return;
+    }
+
+    if(!Array.isArray(currentBoard.transactions)){
+        currentBoard.transactions = [];
+    }
+
+    currentBoard.transactions.push({
+        id:Date.now(),
+        type:type,
+        amount:amount,
+        note:note,
+        date:dateKey(
+            new Date().getFullYear(),
+            new Date().getMonth(),
+            new Date().getDate()
+        )
+    });
 
     if(type==="Ứng lương"){
-        currentBoard.advance += amount;
+        currentBoard.advance =
+            (Number(currentBoard.advance) || 0) + amount;
     }
 
     if(type==="Trừ tiền"){
-        currentBoard.deduct += amount;
+        currentBoard.deduct =
+            (Number(currentBoard.deduct) || 0) + amount;
     }
 
     if(type==="Phụ cấp"){
-        currentBoard.allowance += amount;
+        currentBoard.allowance =
+            (Number(currentBoard.allowance) || 0) + amount;
     }
 
     if(type==="Tăng ca"){
-        currentBoard.overtime += amount;
+        currentBoard.overtime =
+            (Number(currentBoard.overtime) || 0) + amount;
     }
 
     if(type==="Thanh toán"){
-        currentBoard.paid += amount;
+        currentBoard.paid =
+            (Number(currentBoard.paid) || 0) + amount;
     }
-
 
     saveData();
 
     closeModal();
 
     updateSummary();
+    updateMonthStats();
 
 }
 
@@ -3732,6 +4218,7 @@ function changeMonth(direction = 1){
 
     renderCalendar();
     updateSummary();
+    updateMonthStats();
 
 }
 
