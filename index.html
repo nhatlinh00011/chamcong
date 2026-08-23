@@ -1180,6 +1180,9 @@ if(boards.length === 0){
         id:Date.now(),
         name:"Sofa",
         salary:8500000,
+        standardDays:26,
+        hoursPerDay:8,
+        overtimeRate:1.5,
         advance:0,
         deduct:0,
         allowance:0,
@@ -1190,6 +1193,21 @@ if(boards.length === 0){
 
     saveData();
 }
+
+// Bổ sung thiết lập mặc định cho các bảng đã tạo từ phiên bản cũ.
+boards.forEach(board => {
+    if(!board.standardDays) board.standardDays = 26;
+    if(!board.hoursPerDay) board.hoursPerDay = 8;
+    if(!board.overtimeRate) board.overtimeRate = 1.5;
+
+    Object.values(board.attendance || {}).forEach(record => {
+        if(record.overtimeHours === undefined){
+            record.overtimeHours = 0;
+        }
+    });
+});
+
+saveData();
 
 renderBoards();
 
@@ -1292,6 +1310,11 @@ function createBoard(){
 
         salary:
             Number(salary) || 0,
+
+        // 26 ngày công chuẩn/tháng, 8 giờ/ngày, tăng ca hệ số 1.5
+        standardDays:26,
+        hoursPerDay:8,
+        overtimeRate:1.5,
 
         advance:0,
 
@@ -1571,7 +1594,6 @@ function openDay(day){
     const oldRecord =
         currentBoard.attendance[key] || {};
 
-    // Hỗ trợ dữ liệu cũ nếu bảng đã từng dùng Giờ vào/Giờ ra.
     const record = {
         status:
             oldRecord.status === 0.5
@@ -1579,6 +1601,10 @@ function openDay(day){
                 : oldRecord.status === 1
                     ? 1
                     : 0,
+
+        overtimeHours:
+            Number(oldRecord.overtimeHours) || 0,
+
         note:
             oldRecord.note || ""
     };
@@ -1623,6 +1649,28 @@ function openDay(day){
 
             </button>
 
+        </div>
+
+        <div class="note-title">
+            Giờ tăng ca
+        </div>
+
+        <input
+            id="overtimeHours"
+            class="input"
+            type="number"
+            min="0"
+            step="0.5"
+            value="${record.overtimeHours}"
+            placeholder="Ví dụ: 2">
+
+        <div style="
+            color:#888;
+            font-size:14px;
+            margin-top:-6px;
+            margin-bottom:18px;
+        ">
+            Nhập số giờ tăng ca trong ngày
         </div>
 
         <div class="note-title">
@@ -1690,6 +1738,16 @@ function saveAttendance(key){
             ).value
         );
 
+    const overtimeHours =
+        Math.max(
+            0,
+            Number(
+                document.getElementById(
+                    "overtimeHours"
+                ).value
+            ) || 0
+        );
+
     const note =
         document.getElementById(
             "attendanceNote"
@@ -1706,6 +1764,7 @@ function saveAttendance(key){
 
     currentBoard.attendance[key] = {
         status:type,
+        overtimeHours:overtimeHours,
         note:note
     };
 
@@ -1755,28 +1814,102 @@ function updateSummary(){
     }
 
     const salary =
-        Number(currentBoard.salary)||0;
+        Number(currentBoard.salary) || 0;
+
+    const standardDays =
+        Number(currentBoard.standardDays) || 26;
+
+    const hoursPerDay =
+        Number(currentBoard.hoursPerDay) || 8;
+
+    const overtimeRate =
+        Number(currentBoard.overtimeRate) || 1.5;
 
     const advance =
-        Number(currentBoard.advance)||0;
+        Number(currentBoard.advance) || 0;
 
     const deduct =
-        Number(currentBoard.deduct)||0;
+        Number(currentBoard.deduct) || 0;
 
     const allowance =
-        Number(currentBoard.allowance)||0;
+        Number(currentBoard.allowance) || 0;
 
-    const overtime =
-        Number(currentBoard.overtime)||0;
+    const manualOvertime =
+        Number(currentBoard.overtime) || 0;
 
     const paid =
-        Number(currentBoard.paid)||0;
+        Number(currentBoard.paid) || 0;
+
+
+    /*
+     * Lương cơ bản KHÔNG còn được cộng thẳng vào
+     * "Tổng lương".
+     *
+     * Tổng lương = tiền công đã chấm trong tháng
+     *            + tiền tăng ca theo số giờ đã chấm
+     *            + phụ cấp
+     *            + tăng ca nhập thủ công (nếu có)
+     */
+
+    const dailyRate =
+        salary / standardDays;
+
+    const hourlyRate =
+        dailyRate / hoursPerDay;
+
+
+    let earnedWork = 0;
+    let earnedOvertime = 0;
+    let workedDays = 0;
+    let totalOvertimeHours = 0;
+
+
+    Object.entries(
+        currentBoard.attendance || {}
+    ).forEach(
+        ([date, record]) => {
+
+            if(!date.startsWith(
+                `${currentYear}-${String(currentMonth+1).padStart(2,"0")}-`
+            )){
+                return;
+            }
+
+            const status =
+                Number(record.status) || 0;
+
+            if(status === 1){
+                earnedWork += dailyRate;
+                workedDays += 1;
+            }
+
+            if(status === 0.5){
+                earnedWork += dailyRate * 0.5;
+                workedDays += 0.5;
+            }
+
+            const ot =
+                Math.max(
+                    0,
+                    Number(record.overtimeHours) || 0
+                );
+
+            totalOvertimeHours += ot;
+
+            earnedOvertime +=
+                hourlyRate *
+                ot *
+                overtimeRate;
+
+        }
+    );
 
 
     const total =
-        salary +
+        earnedWork +
+        earnedOvertime +
         allowance +
-        overtime;
+        manualOvertime;
 
 
     const remain =
@@ -1810,6 +1943,29 @@ function updateSummary(){
         "totalRemain"
     ).innerText =
         money(remain);
+
+
+    // Hiển thị nhanh trạng thái ở thanh dưới.
+    const bottomMessage =
+        document.getElementById(
+            "bottomMessage"
+        );
+
+    if(bottomMessage){
+
+        if(workedDays > 0 || totalOvertimeHours > 0){
+
+            bottomMessage.innerText =
+                `${workedDays} công • ${totalOvertimeHours} giờ tăng ca • ${money(total)}`;
+
+        }else{
+
+            bottomMessage.innerText =
+                "Bạn chưa chấm công";
+
+        }
+
+    }
 
 }
 
@@ -1983,7 +2139,34 @@ function openSettings(){
             id="newSalary"
             class="input"
             type="number"
-            value="${currentBoard.salary}">
+            value="${currentBoard.salary}"
+            placeholder="Lương cơ bản/tháng">
+
+        <input
+            id="newStandardDays"
+            class="input"
+            type="number"
+            min="1"
+            value="${currentBoard.standardDays || 26}"
+            placeholder="Ngày công chuẩn/tháng">
+
+        <input
+            id="newHoursPerDay"
+            class="input"
+            type="number"
+            min="1"
+            step="0.5"
+            value="${currentBoard.hoursPerDay || 8}"
+            placeholder="Số giờ công/ngày">
+
+        <input
+            id="newOvertimeRate"
+            class="input"
+            type="number"
+            min="1"
+            step="0.1"
+            value="${currentBoard.overtimeRate || 1.5}"
+            placeholder="Hệ số tăng ca">
 
         <button
             class="primary"
@@ -2022,6 +2205,36 @@ function saveSettings(){
                 "newSalary"
             ).value
         ) || 0;
+
+    currentBoard.standardDays =
+        Math.max(
+            1,
+            Number(
+                document.getElementById(
+                    "newStandardDays"
+                ).value
+            ) || 26
+        );
+
+    currentBoard.hoursPerDay =
+        Math.max(
+            1,
+            Number(
+                document.getElementById(
+                    "newHoursPerDay"
+                ).value
+            ) || 8
+        );
+
+    currentBoard.overtimeRate =
+        Math.max(
+            1,
+            Number(
+                document.getElementById(
+                    "newOvertimeRate"
+                ).value
+            ) || 1.5
+        );
 
 
     saveData();
@@ -2155,6 +2368,38 @@ function openDayDetail(key){
                 ? "Cả ngày"
                 : "Chưa xác định";
 
+    const salary =
+        Number(currentBoard.salary) || 0;
+
+    const standardDays =
+        Number(currentBoard.standardDays) || 26;
+
+    const hoursPerDay =
+        Number(currentBoard.hoursPerDay) || 8;
+
+    const overtimeRate =
+        Number(currentBoard.overtimeRate) || 1.5;
+
+    const dailyRate =
+        salary / standardDays;
+
+    const hourlyRate =
+        dailyRate / hoursPerDay;
+
+    const workMoney =
+        (Number(record.status) || 0) * dailyRate;
+
+    const overtimeHours =
+        Number(record.overtimeHours) || 0;
+
+    const overtimeMoney =
+        overtimeHours *
+        hourlyRate *
+        overtimeRate;
+
+    const earned =
+        workMoney + overtimeMoney;
+
     openModal(`
 
         <h2>
@@ -2172,6 +2417,34 @@ function openDayDetail(key){
             Công
             <strong>
                 ${statusText}
+            </strong>
+        </div>
+
+        <div class="appendix-item">
+            Giờ tăng ca
+            <strong>
+                ${overtimeHours} giờ
+            </strong>
+        </div>
+
+        <div class="appendix-item">
+            Tiền công ngày
+            <strong>
+                ${money(workMoney)}
+            </strong>
+        </div>
+
+        <div class="appendix-item">
+            Tiền tăng ca
+            <strong>
+                ${money(overtimeMoney)}
+            </strong>
+        </div>
+
+        <div class="appendix-item">
+            Tổng nhận ngày
+            <strong style="color:#2670ff">
+                ${money(earned)}
             </strong>
         </div>
 
