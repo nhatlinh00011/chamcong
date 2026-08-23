@@ -1389,7 +1389,7 @@ button{
    <button type="button" class="login-btn login-facebook" onclick="loginWithFacebook()"><span class="login-icon facebook-f">f</span><span>Đăng nhập Facebook</span></button>
    <button type="button" class="login-btn login-guest" onclick="loginAsGuest()"><span class="login-icon">👤</span><span>Đăng nhập khách</span></button>
   </div>
-  <div class="login-note">Google và Facebook sẽ được kết nối Firebase ở bước thiết lập. Chế độ khách có thể sử dụng ngay trên thiết bị này.</div>
+  <div class="login-note">Google đã được kết nối Firebase để xác thực tài khoản. Dữ liệu sẽ được đồng bộ lên đám mây khi bật chức năng sao lưu.</div>
   <div class="login-footer">Sản phẩm thuộc hệ sinh thái <strong>DG Media Official</strong></div>
  </div>
 </div>
@@ -1806,6 +1806,75 @@ button{
                 Xin chân thành cảm ơn!
             </div>
         </footer>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBxPMpPDN6hAOfDzTmpDiDpH_1Fk6_gZVY",
+    authDomain: "dg-cham-cong.firebaseapp.com",
+    projectId: "dg-cham-cong",
+    storageBucket: "dg-cham-cong.firebasestorage.app",
+    messagingSenderId: "211534090102",
+    appId: "1:211534090102:web:bf5c09183b2b26a250f457",
+    measurementId: "G-VB5ZTQ64SJ"
+  };
+
+  const firebaseApp = initializeApp(firebaseConfig);
+  const auth = getAuth(firebaseApp);
+  const googleProvider = new GoogleAuthProvider();
+  googleProvider.setCustomParameters({ prompt: "select_account" });
+
+  async function setupFirebaseAuth() {
+    try { await setPersistence(auth, browserLocalPersistence); } catch (e) { console.warn("Firebase persistence:", e); }
+  }
+
+  function showMainAppFromFirebase(user) {
+    if (!user) return;
+    const login = document.getElementById("loginScreen");
+    const app = document.querySelector(".app");
+    try {
+      localStorage.setItem("dgAuthSession", JSON.stringify({
+        type: "google", loggedIn: true, uid: user.uid,
+        name: user.displayName || "", email: user.email || "",
+        photoURL: user.photoURL || "", at: Date.now()
+      }));
+    } catch (e) {}
+    if (login) login.style.display = "none";
+    if (app) app.classList.remove("auth-hidden");
+  }
+
+  window.loginWithGoogle = async function () {
+    const button = document.querySelector(".login-google");
+    const label = button ? button.querySelector("span:last-child") : null;
+    const oldText = label ? label.textContent : "Đăng nhập Google";
+    try {
+      if (button) button.disabled = true;
+      if (label) label.textContent = "Đang kết nối Google...";
+      await setupFirebaseAuth();
+      const result = await signInWithPopup(auth, googleProvider);
+      showMainAppFromFirebase(result.user);
+    } catch (error) {
+      console.error("Firebase Google Sign-In:", error);
+      let message = "Không thể đăng nhập Google. Vui lòng thử lại.";
+      if (error?.code === "auth/popup-closed-by-user") message = "Bạn đã đóng cửa sổ đăng nhập Google.";
+      else if (error?.code === "auth/popup-blocked") message = "Trình duyệt đã chặn cửa sổ Google. Hãy cho phép cửa sổ bật lên rồi thử lại.";
+      else if (error?.code === "auth/unauthorized-domain") message = "Tên miền hiện tại chưa được thêm vào Firebase → Authentication → Settings → Authorized domains.";
+      else if (error?.code === "auth/operation-not-allowed") message = "Google Sign-in chưa được bật trong Firebase Authentication.";
+      alert(message);
+    } finally {
+      if (button) button.disabled = false;
+      if (label) label.textContent = oldText;
+    }
+  };
+
+  setupFirebaseAuth().then(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) showMainAppFromFirebase(user);
+    });
+  });
+</script>
 
 <script>
 
@@ -4789,7 +4858,7 @@ function escapeAttr(text){
 
 function showMainApp(){const login=document.getElementById("loginScreen");const app=document.querySelector(".app");if(login)login.style.display="none";if(app)app.classList.remove("auth-hidden")}
 function loginAsGuest(){try{localStorage.setItem("dgAuthSession",JSON.stringify({type:"guest",loggedIn:true,at:Date.now()}))}catch(e){}showMainApp()}
-function loginWithGoogle(){alert("Đăng nhập Google chưa được kết nối Firebase. Giao diện đã sẵn sàng; bước tiếp theo sẽ kết nối tài khoản Google và đồng bộ dữ liệu lên đám mây.")}
+// loginWithGoogle được Firebase module ở phía trên cung cấp.
 function loginWithFacebook(){alert("Đăng nhập Facebook chưa được kết nối Firebase. Giao diện đã sẵn sàng; bước tiếp theo sẽ kết nối tài khoản Facebook và đồng bộ dữ liệu lên đám mây.")}
 (function(){try{const s=JSON.parse(localStorage.getItem("dgAuthSession")||"null");if(s&&s.loggedIn)showMainApp()}catch(e){}})();
 
