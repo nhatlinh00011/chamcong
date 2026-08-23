@@ -2030,6 +2030,11 @@ function openDay(day){
 
         <input
             type="hidden"
+            id="selectedWorkType"
+            value="${record.status || ""}">
+
+        <input
+            type="hidden"
             id="selectedOvertimeHours"
             value="${record.overtimeHours}">
 
@@ -2290,8 +2295,8 @@ function saveAttendance(key){
         Number(
             document.getElementById(
                 "selectedWorkType"
-            ).value
-        );
+            )?.value
+        ) || 0;
 
     const overtimeHours =
         Math.max(
