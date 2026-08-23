@@ -1361,6 +1361,16 @@ button{
 }
 
 
+/* BOTTOM NAV + CLOUD ACCOUNT */
+.bottom-nav{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(600px,100%);height:68px;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-top:1px solid rgba(35,31,95,.08);display:flex;align-items:stretch;justify-content:space-around;z-index:50;box-shadow:0 -5px 20px rgba(35,31,95,.06)}
+.nav-btn{flex:1;background:none;color:#85829a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:600}
+.nav-btn .nav-icon{font-size:23px;line-height:1}.nav-btn.active{color:#6847ff}.nav-btn:active{transform:scale(.96)}
+.bottom-bar{bottom:68px}
+.screen-pad{padding:20px 20px 90px}.screen-title{font-size:29px;font-weight:800;color:#211b52;margin:8px 2px 18px}
+.data-hero{background:linear-gradient(135deg,#6847ff,#8a6bff);color:white;border-radius:24px;padding:20px;box-shadow:0 12px 26px rgba(104,71,255,.22);margin-bottom:16px}.data-hero-label{font-size:14px;opacity:.88}.data-hero-value{font-size:29px;font-weight:800;margin-top:5px}.data-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.data-stat{background:rgba(255,255,255,.14);border-radius:15px;padding:10px}.data-stat strong{display:block;font-size:18px;margin-bottom:2px}.data-card{background:white;border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 6px 18px rgba(40,40,80,.06)}.data-card h3{font-size:17px;margin-bottom:10px}.history-list{display:flex;flex-direction:column;gap:9px;max-height:52vh;overflow:auto}.history-item{background:#f7f8fa;border:1px solid #e8e8ee;border-radius:15px;padding:12px}.history-top{display:flex;justify-content:space-between;gap:10px}.history-sub{font-size:13px;color:#888;margin-top:4px}.history-money{font-weight:800;color:#2670ff;white-space:nowrap}
+.account-card{background:white;border-radius:24px;padding:20px;box-shadow:0 6px 18px rgba(40,40,80,.06);text-align:center}.account-avatar{width:88px;height:88px;border-radius:50%;object-fit:cover;background:#eeeaff;display:block;margin:2px auto 12px;border:3px solid white;box-shadow:0 5px 16px rgba(0,0,0,.12)}.account-name{font-size:22px;font-weight:800;color:#211b52}.account-email{font-size:14px;color:#888;margin-top:4px;word-break:break-word}.sync-status{margin:16px 0;padding:12px;border-radius:15px;background:#f1f8ff;color:#2670ff;font-size:14px}.account-actions{display:flex;flex-direction:column;gap:10px}.account-btn{width:100%;padding:14px;border-radius:15px;background:#f2f2f6;color:#211b52;font-size:16px;font-weight:700}.account-btn.primary-account{background:#6847ff;color:white}.account-btn.danger-account{background:#fff0f0;color:#e53935}.avatar-input{display:none}
+@media(max-width:480px){.screen-title{font-size:26px}.data-hero-value{font-size:26px}}
+
 /* LOGIN */
 .login-screen{min-height:100vh;min-height:100dvh;box-sizing:border-box;padding:40px 24px 28px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#eef8f8 0%,#f7fbfb 100%)}
 .login-card{width:100%;max-width:430px;text-align:center}.login-logo{width:96px;height:96px;object-fit:cover;border-radius:24px;display:block;margin:0 auto 24px;box-shadow:0 12px 30px rgba(55,100,180,.18)}
@@ -1738,6 +1748,41 @@ button{
 
 </div>
 
+    <!-- ===================== DATA / ACCOUNT ===================== -->
+    <div id="dataScreen" class="hidden screen-pad">
+        <div class="screen-title">Dữ liệu</div>
+        <div id="dataHero"></div>
+        <div class="data-card">
+            <h3>Lịch sử chấm công</h3>
+            <div id="historyList" class="history-list"></div>
+        </div>
+        <button class="primary" type="button" onclick="exportAllData()">📥 Xuất toàn bộ dữ liệu</button>
+    </div>
+
+    <div id="accountScreen" class="hidden screen-pad">
+        <div class="screen-title">Tài khoản</div>
+        <div class="account-card">
+            <img id="accountAvatar" class="account-avatar" src="logo.webp" alt="Avatar">
+            <div id="accountName" class="account-name">Tài khoản</div>
+            <div id="accountEmail" class="account-email"></div>
+            <div id="syncStatus" class="sync-status">☁️ Chưa kết nối đồng bộ</div>
+            <div class="account-actions">
+                <button class="account-btn" type="button" onclick="changeDisplayName()">✏️ Đổi tên hiển thị</button>
+                <label class="account-btn" for="avatarInput">🖼️ Đổi avatar</label>
+                <input id="avatarInput" class="avatar-input" type="file" accept="image/*" onchange="changeAvatar(event)">
+                <button class="account-btn primary-account" type="button" onclick="syncNow()">🔄 Đồng bộ ngay</button>
+                <button class="account-btn danger-account" type="button" onclick="logoutAccount()">Đăng xuất</button>
+            </div>
+        </div>
+        <div class="data-card" style="margin-top:14px">
+            <h3>Gợi ý chức năng</h3>
+            <div class="appendix-item">Nhắc chấm công <strong>Đang phát triển</strong></div>
+            <div class="appendix-item">Báo cáo tháng <strong>Đang phát triển</strong></div>
+            <div class="appendix-item">Sao lưu tự động <strong>Đã bật</strong></div>
+        </div>
+    </div>
+
+
 
 <!-- BOTTOM -->
 
@@ -1760,6 +1805,12 @@ button{
 
     </button>
 
+</div>
+
+<div id="bottomNav" class="bottom-nav hidden">
+    <button class="nav-btn active" data-screen="home" onclick="navigateApp('home')"><span class="nav-icon">⌂</span><span>Trang chủ</span></button>
+    <button class="nav-btn" data-screen="data" onclick="navigateApp('data')"><span class="nav-icon">▤</span><span>Dữ liệu</span></button>
+    <button class="nav-btn" data-screen="account" onclick="navigateApp('account')"><span class="nav-icon">◉</span><span>Tài khoản</span></button>
 </div>
 
 
@@ -1809,7 +1860,8 @@ button{
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+  import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, setPersistence, browserLocalPersistence, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBxPMpPDN6hAOfDzTmpDiDpH_1Fk6_gZVY",
@@ -1823,8 +1875,88 @@ button{
 
   const firebaseApp = initializeApp(firebaseConfig);
   const auth = getAuth(firebaseApp);
+  const db = getFirestore(firebaseApp);
+  let cloudUser = null;
+  let cloudUnsubscribe = null;
   const googleProvider = new GoogleAuthProvider();
   googleProvider.setCustomParameters({ prompt: "select_account" });
+
+
+  function cloudRef(uid){ return doc(db, "users", uid, "appData", "main"); }
+
+  function setSyncStatus(text, ok=false){
+    const el = document.getElementById("syncStatus");
+    if(el){ el.textContent = text; el.style.background = ok ? "#effaf1" : "#f1f8ff"; el.style.color = ok ? "#2e8b3c" : "#2670ff"; }
+  }
+
+  async function pushCloud(boardsToSave){
+    if(!cloudUser) return false;
+    try{
+      await setDoc(cloudRef(cloudUser.uid), {
+        boards: boardsToSave,
+        updatedAt: Date.now(),
+        profile: { name: cloudUser.displayName || "", email: cloudUser.email || "", photoURL: cloudUser.photoURL || "", avatar: localStorage.getItem("dgAvatar") || "" }
+      }, { merge:true });
+      localStorage.setItem("dgCloudLastSync", String(Date.now()));
+      setSyncStatus("☁️ Đã đồng bộ lúc " + new Date().toLocaleTimeString("vi-VN",{hour:"2-digit",minute:"2-digit"}), true);
+      return true;
+    }catch(e){ console.error("Firestore save:", e); setSyncStatus("⚠️ Đồng bộ thất bại — kiểm tra Firestore Rules", false); return false; }
+  }
+
+  async function loadCloud(user){
+    if(!user) return;
+    try{
+      const snap = await getDoc(cloudRef(user.uid));
+      const localUpdated = Number(localStorage.getItem("dgLocalUpdatedAt") || 0);
+      if(snap.exists()){
+        const data = snap.data() || {};
+        const cloudUpdated = Number(data.updatedAt || 0);
+        if(Array.isArray(data.boards) && data.boards.length && cloudUpdated >= localUpdated){
+          window.__applyCloudBoards(data.boards);
+        }else if(localUpdated > cloudUpdated){
+          await pushCloud(window.__getBoards());
+        }
+      }else{
+        await pushCloud(window.__getBoards());
+      }
+      setSyncStatus("☁️ Đã kết nối đồng bộ", true);
+    }catch(e){ console.error("Firestore load:", e); setSyncStatus("⚠️ Không tải được dữ liệu đám mây", false); }
+  }
+
+  function startCloudListener(user){
+    if(cloudUnsubscribe) cloudUnsubscribe();
+    cloudUnsubscribe = onSnapshot(cloudRef(user.uid), snap => {
+      if(!snap.exists()) return;
+      const data = snap.data() || {};
+      if(data.profile?.avatar){ try{ localStorage.setItem("dgAvatar", data.profile.avatar); }catch(e){} }
+      if(Array.isArray(data.boards) && data.boards.length){
+        const cloudUpdated = Number(data.updatedAt || 0);
+        const localUpdated = Number(localStorage.getItem("dgLocalUpdatedAt") || 0);
+        if(cloudUpdated >= localUpdated) window.__applyCloudBoards(data.boards, cloudUpdated);
+      }
+      setSyncStatus("☁️ Đã đồng bộ", true);
+    }, err => { console.error("Firestore listener:", err); setSyncStatus("⚠️ Mất kết nối đồng bộ", false); });
+  }
+
+  window.__dgCloudSync = {
+    setUser: async function(user){
+      cloudUser = user || null;
+      if(!cloudUser){ if(cloudUnsubscribe) cloudUnsubscribe(); cloudUnsubscribe=null; return; }
+      setSyncStatus("☁️ Đang tải dữ liệu...", false);
+      await loadCloud(cloudUser);
+      startCloudListener(cloudUser);
+    },
+    queueSave: function(data){
+      clearTimeout(window.__dgCloudSaveTimer);
+      window.__dgCloudSaveTimer = setTimeout(() => pushCloud(data), 450);
+    },
+    pushNow: function(){ return pushCloud(window.__getBoards ? window.__getBoards() : []); },
+    getUser: function(){ return cloudUser; },
+    logout: async function(){
+      try { await signOut(auth); } finally { cloudUser=null; if(cloudUnsubscribe) cloudUnsubscribe(); cloudUnsubscribe=null; localStorage.removeItem("dgAuthSession"); }
+    },
+    updateProfile: async function(name){ if(!cloudUser) return false; await updateProfile(cloudUser,{displayName:name}); await pushCloud(window.__getBoards()); return true; }
+  };
 
   async function setupFirebaseAuth() {
     try { await setPersistence(auth, browserLocalPersistence); } catch (e) { console.warn("Firebase persistence:", e); }
@@ -1881,8 +2013,12 @@ button{
       alert(message);
     }
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) showMainAppFromFirebase(user);
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        showMainAppFromFirebase(user);
+        if(window.__dgCloudSync) await window.__dgCloudSync.setUser(user);
+        if(window.__refreshAccountScreen) window.__refreshAccountScreen();
+      }
     });
   });
 </script>
@@ -1905,6 +2041,22 @@ let currentMonth =
 
 let currentYear =
     new Date().getFullYear();
+
+window.__getBoards = () => boards;
+window.__applyCloudBoards = function(cloudBoards, cloudUpdated=Date.now()){
+    if(!Array.isArray(cloudBoards)) return;
+    boards = cloudBoards;
+    try{
+        localStorage.setItem("attendanceBoards", JSON.stringify(boards));
+        localStorage.setItem("dgLocalUpdatedAt", String(cloudUpdated));
+    }catch(e){}
+    if(currentBoard){
+        currentBoard = boards.find(b => b.id === currentBoard.id) || null;
+    }
+    renderBoards();
+    if(currentBoard){ renderCalendar(); updateSummary(); }
+    if(window.refreshDataScreen) window.refreshDataScreen();
+};
 
 
 /* =========================================
@@ -1964,6 +2116,8 @@ function saveData(){
         "attendanceBoards",
         JSON.stringify(boards)
     );
+    localStorage.setItem("dgLocalUpdatedAt", String(Date.now()));
+    if(window.__dgCloudSync) window.__dgCloudSync.queueSave(boards);
 }
 
 
@@ -2089,6 +2243,7 @@ function createBoard(){
 
 function openBoard(id){
 
+    navigateApp("home");
     currentBoard =
         boards.find(
             b=>b.id===id
@@ -2128,6 +2283,7 @@ function openBoard(id){
 
 function showList(){
 
+    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active", b.dataset.screen==="home"));
     document
         .getElementById("detailScreen")
         .classList.add("hidden");
@@ -4867,11 +5023,83 @@ function escapeAttr(text){
 
 
 
-function showMainApp(){const login=document.getElementById("loginScreen");const app=document.querySelector(".app");if(login)login.style.display="none";if(app)app.classList.remove("auth-hidden")}
+function showMainApp(){const login=document.getElementById("loginScreen");const app=document.querySelector(".app");const nav=document.getElementById("bottomNav");if(login)login.style.display="none";if(app)app.classList.remove("auth-hidden");if(nav)nav.classList.remove("hidden");if(window.__refreshAccountScreen)window.__refreshAccountScreen();}
 function loginAsGuest(){try{localStorage.setItem("dgAuthSession",JSON.stringify({type:"guest",loggedIn:true,at:Date.now()}))}catch(e){}showMainApp()}
 // loginWithGoogle được Firebase module ở phía trên cung cấp.
 function loginWithFacebook(){alert("Đăng nhập Facebook chưa được kết nối Firebase. Giao diện đã sẵn sàng; bước tiếp theo sẽ kết nối tài khoản Facebook và đồng bộ dữ liệu lên đám mây.")}
 (function(){try{const s=JSON.parse(localStorage.getItem("dgAuthSession")||"null");if(s&&s.loggedIn)showMainApp()}catch(e){}})();
+
+/* =========================================
+   HOME / DATA / ACCOUNT
+========================================= */
+function hideAppScreens(){
+    ["listScreen","detailScreen","dataScreen","accountScreen"].forEach(id=>document.getElementById(id)?.classList.add("hidden"));
+    document.getElementById("bottomBar")?.classList.add("hidden");
+}
+function navigateApp(screen){
+    hideAppScreens();
+    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active", b.dataset.screen===screen));
+    if(screen==="home"){
+        document.getElementById("listScreen")?.classList.remove("hidden");
+        renderBoards();
+    }else if(screen==="data"){
+        document.getElementById("dataScreen")?.classList.remove("hidden");
+        refreshDataScreen();
+    }else{
+        document.getElementById("accountScreen")?.classList.remove("hidden");
+        refreshAccountScreen();
+    }
+}
+function refreshDataScreen(){
+    const all=[]; let total=0, workDays=0, otHours=0; let earliest="", latest="";
+    boards.forEach(board=>{
+        const salary=Number(board.salary)||0, standard=Math.max(1,Number(board.standardDays)||26), hoursDay=Math.max(1,Number(board.hoursPerDay)||8), daily=salary/standard, hourly=daily/hoursDay, defaultRate=Number(board.overtimeRate)||1.5;
+        Object.entries(board.attendance||{}).forEach(([date,r])=>{
+            const status=Number(r?.status)||0; const ot=Math.max(0,Number(r?.overtimeHours)||0); const rate=Math.max(1,Number(r?.overtimeRate)||defaultRate); const earned=(status===1?daily:status===0.5?daily*.5:0)+(ot*hourly*rate);
+            if(status===1)workDays+=1; else if(status===0.5)workDays+=.5; otHours+=ot; total+=earned;
+            if(!earliest||date<earliest)earliest=date; if(!latest||date>latest)latest=date;
+            all.push({date,board:board.name,status,ot,rate,earned,note:r?.note||""});
+        });
+    });
+    all.sort((a,b)=>b.date.localeCompare(a.date));
+    const hero=document.getElementById("dataHero");
+    if(hero) hero.innerHTML=`<div class="data-hero"><div class="data-hero-label">Tổng tiền công đã làm</div><div class="data-hero-value">${money(total)}</div><div class="data-grid"><div class="data-stat"><strong>${formatWorkDays(workDays)}</strong><span>Ngày công</span></div><div class="data-stat"><strong>${formatHours(otHours)}</strong><span>Tăng ca</span></div></div><div style="margin-top:12px;font-size:13px;opacity:.9">${earliest?`Từ ${formatDateVN(earliest)} đến ${formatDateVN(latest)}`:"Chưa có dữ liệu chấm công"}</div></div>`;
+    const list=document.getElementById("historyList");
+    if(list) list.innerHTML=all.length?all.map(x=>`<div class="history-item"><div class="history-top"><strong>${formatDateVN(x.date)} · ${escapeHtml(x.board)}</strong><span class="history-money">${money(x.earned)}</span></div><div class="history-sub">${x.status===1?"Cả ngày":x.status===0.5?"1/2 công":x.status===3?"Nghỉ có lương":x.status===4?"Nghỉ không lương":"Khác"}${x.ot>0?` · ${formatHours(x.ot)} · X${String(x.rate).replace(".",",")}`:""}</div>${x.note?`<div class="history-sub">${escapeHtml(x.note)}</div>`:""}</div>`).join(""):"<div class='salary-detail-empty'>Chưa có dữ liệu chấm công.</div>";
+}
+window.refreshDataScreen=refreshDataScreen;
+function refreshAccountScreen(){
+    const user=window.__dgCloudSync?.getUser?.(); const session=JSON.parse(localStorage.getItem("dgAuthSession")||"null")||{};
+    const name=user?.displayName||session.name||"Khách"; const email=user?.email||session.email||""; const photo=user?.photoURL||localStorage.getItem("dgAvatar")||"logo.webp";
+    const a=document.getElementById("accountAvatar"); if(a)a.src=photo;
+    const n=document.getElementById("accountName"); if(n)n.textContent=name;
+    const e=document.getElementById("accountEmail"); if(e)e.textContent=email||"Đăng nhập khách — dữ liệu chỉ lưu trên thiết bị";
+    const s=document.getElementById("syncStatus"); if(s)s.textContent=user?"☁️ Đã kết nối đồng bộ":"📱 Chế độ trên thiết bị";
+}
+window.__refreshAccountScreen=refreshAccountScreen;
+function changeDisplayName(){
+    const current=document.getElementById("accountName")?.textContent||""; const name=prompt("Tên hiển thị mới:",current); if(!name||!name.trim())return;
+    const sync=window.__dgCloudSync;
+    if(sync?.getUser?.()) sync.updateProfile(name.trim()).then(()=>{localStorage.setItem("dgAuthSession",JSON.stringify({...JSON.parse(localStorage.getItem("dgAuthSession")||"{}"),name:name.trim()}));refreshAccountScreen();alert("Đã đổi tên hiển thị.");}).catch(e=>alert("Không đổi được tên: "+e.message));
+    else { localStorage.setItem("dgDisplayName",name.trim()); refreshAccountScreen(); }
+}
+function changeAvatar(event){
+    const file=event.target.files?.[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{ const img=new Image(); img.onload=()=>{ const c=document.createElement("canvas"); const size=160;c.width=size;c.height=size;const ctx=c.getContext("2d");ctx.drawImage(img,0,0,size,size);const data=c.toDataURL("image/jpeg",.78);localStorage.setItem("dgAvatar",data);refreshAccountScreen(); if(window.__dgCloudSync?.pushNow) window.__dgCloudSync.pushNow(); };img.src=reader.result;};reader.readAsDataURL(file);
+}
+async function syncNow(){
+    if(window.__dgCloudSync?.getUser?.()){ const ok=await window.__dgCloudSync.pushNow(); if(ok) { refreshDataScreen(); alert("Đã đồng bộ dữ liệu lên Firebase."); } }
+    else alert("Bạn đang ở chế độ khách. Hãy đăng nhập Google để đồng bộ trên nhiều thiết bị.");
+}
+async function logoutAccount(){
+    if(!confirm("Đăng xuất khỏi tài khoản này?"))return;
+    try{ if(window.__dgCloudSync?.getUser?.()) await window.__dgCloudSync.logout(); }catch(e){console.error(e)}
+    localStorage.removeItem("dgAuthSession"); document.getElementById("bottomNav")?.classList.add("hidden"); document.querySelector(".app")?.classList.add("auth-hidden"); document.getElementById("loginScreen")?.style.removeProperty("display"); navigateApp("home");
+}
+function exportAllData(){
+    const rows=[["Ngày","Bảng","Công","Tăng ca (giờ)","Hệ số","Tiền công","Ghi chú"]];
+    boards.forEach(board=>{const salary=Number(board.salary)||0, standard=Math.max(1,Number(board.standardDays)||26), hoursDay=Math.max(1,Number(board.hoursPerDay)||8), daily=salary/standard, hourly=daily/hoursDay, def=Number(board.overtimeRate)||1.5;Object.entries(board.attendance||{}).sort(([a],[b])=>a.localeCompare(b)).forEach(([date,r])=>{const st=Number(r?.status)||0,ot=Number(r?.overtimeHours)||0,rate=Number(r?.overtimeRate)||def;const work=st===1?daily:st===.5?daily*.5:0;rows.push([date,board.name,st===1?"Cả ngày":st===.5?"1/2 công":st===3?"Nghỉ có lương":st===4?"Nghỉ không lương":"Khác",ot,rate,Math.round(work+ot*hourly*rate),String(r?.note||"").replaceAll('"','""')]);});});
+    const csv="\ufeff"+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="DG-Cham-Cong-Toan-Bo.csv";a.click();URL.revokeObjectURL(url);
+}
 
 /* =========================================
    PWA / OFFLINE
