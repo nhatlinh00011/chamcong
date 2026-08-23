@@ -1860,7 +1860,7 @@ button{
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged, setPersistence, browserLocalPersistence, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, setPersistence, browserLocalPersistence, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -1985,12 +1985,19 @@ button{
       if (button) button.disabled = true;
       if (label) label.textContent = "Đang kết nối Google...";
       await setupFirebaseAuth();
-      await signInWithRedirect(auth, googleProvider);
+      const result = await signInWithPopup(auth, googleProvider);
+      if (result?.user) {
+        showMainAppFromFirebase(result.user);
+        if(window.__dgCloudSync) await window.__dgCloudSync.setUser(result.user);
+        if(window.__refreshAccountScreen) window.__refreshAccountScreen();
+      }
     } catch (error) {
       console.error("Firebase Google Sign-In:", error);
       let message = "Không thể đăng nhập Google. Vui lòng thử lại.";
       if (error?.code === "auth/unauthorized-domain") message = "Tên miền hiện tại chưa được thêm vào Firebase → Authentication → Settings → Authorized domains.";
       else if (error?.code === "auth/operation-not-allowed") message = "Google Sign-in chưa được bật trong Firebase Authentication.";
+      else if (error?.code === "auth/popup-closed-by-user") message = "Bạn đã đóng cửa sổ đăng nhập Google.";
+      else if (error?.code === "auth/popup-blocked") message = "Trình duyệt đã chặn cửa sổ Google. Hãy cho phép cửa sổ bật lên rồi thử lại.";
       else if (error?.code === "auth/invalid-continue-uri") message = "Địa chỉ quay lại sau đăng nhập chưa hợp lệ.";
       alert(message);
     } finally {
@@ -1999,20 +2006,7 @@ button{
     }
   };
 
-  setupFirebaseAuth().then(async () => {
-    try {
-      const redirectResult = await getRedirectResult(auth);
-      if (redirectResult?.user) {
-        showMainAppFromFirebase(redirectResult.user);
-      }
-    } catch (error) {
-      console.error("Firebase Google Redirect:", error);
-      let message = "Đăng nhập Google chưa hoàn tất. Vui lòng thử lại.";
-      if (error?.code === "auth/unauthorized-domain") message = "Tên miền hiện tại chưa được thêm vào Firebase → Authentication → Settings → Authorized domains.";
-      else if (error?.code === "auth/operation-not-allowed") message = "Google Sign-in chưa được bật trong Firebase Authentication.";
-      alert(message);
-    }
-
+  setupFirebaseAuth().then(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         showMainAppFromFirebase(user);
