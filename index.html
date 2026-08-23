@@ -1,181 +1,2202 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
 
-  <meta name="theme-color"
-        content="#FFC107">
+<meta name="viewport"
+      content="width=device-width,
+      initial-scale=1.0,
+      maximum-scale=1.0,
+      user-scalable=no">
 
-  <title>Chấm Công</title>
+<meta name="theme-color" content="#eef8f8">
 
-  <link rel="stylesheet" href="style.css">
+<title>Chấm Công</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background:#eef8f8;
+    color:#211b52;
+
+    min-height:100vh;
+}
+
+button{
+    font-family:inherit;
+}
+
+.app{
+    width:100%;
+    max-width:600px;
+    min-height:100vh;
+    margin:auto;
+    padding-bottom:90px;
+}
+
+/* ==============================
+   COMMON
+================================ */
+
+.hidden{
+    display:none!important;
+}
+
+button{
+    border:0;
+    cursor:pointer;
+}
+
+/* ==============================
+   LIST SCREEN
+================================ */
+
+.list-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:28px 22px 18px;
+}
+
+.list-title{
+    font-size:30px;
+    font-weight:700;
+}
+
+.add-btn{
+    width:52px;
+    height:52px;
+
+    border-radius:18px;
+
+    background:#6847ff;
+    color:white;
+
+    font-size:32px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    box-shadow:0 8px 18px rgba(104,71,255,.25);
+}
+
+.board-list{
+    padding:0 20px;
+}
+
+.board-card{
+    background:white;
+
+    border-radius:24px;
+
+    padding:20px;
+
+    margin-bottom:14px;
+
+    box-shadow:
+        0 5px 18px rgba(40,40,80,.07);
+
+    display:flex;
+    align-items:center;
+
+    gap:15px;
+}
+
+.board-icon{
+    width:54px;
+    height:54px;
+
+    border-radius:17px;
+
+    background:#edf9ed;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:27px;
+}
+
+.board-info{
+    flex:1;
+}
+
+.board-info h3{
+    font-size:19px;
+    margin-bottom:5px;
+}
+
+.board-info p{
+    color:#85829a;
+    font-size:14px;
+}
+
+.board-arrow{
+    font-size:25px;
+    color:#aaa;
+}
+
+
+/* ==============================
+   DETAIL HEADER
+================================ */
+
+.detail-header{
+    display:flex;
+    align-items:center;
+
+    padding:25px 20px 15px;
+
+    gap:10px;
+}
+
+.back-btn{
+    background:none;
+
+    font-size:39px;
+
+    color:#25203d;
+
+    line-height:1;
+}
+
+.detail-name{
+    font-size:30px;
+    font-weight:500;
+
+    flex:1;
+}
+
+.settings-btn{
+    width:52px;
+    height:52px;
+
+    border-radius:50%;
+
+    background:white;
+
+    font-size:25px;
+
+    box-shadow:
+        0 4px 15px rgba(0,0,0,.06);
+}
+
+
+/* ==============================
+   TOOLS
+================================ */
+
+.tools{
+    background:white;
+
+    margin:0 20px;
+
+    border-radius:0 0 25px 25px;
+
+    padding:22px 12px;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap:20px 8px;
+}
+
+.tool{
+    background:none;
+
+    color:#211b52;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    gap:8px;
+
+    font-size:16px;
+}
+
+.tool-icon{
+    width:62px;
+    height:62px;
+
+    background:white;
+
+    border-radius:18px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    color:#48b84c;
+
+    font-size:29px;
+
+    box-shadow:
+        0 6px 17px rgba(0,0,0,.10);
+}
+
+
+/* ==============================
+   SALARY SUMMARY
+================================ */
+
+.summary{
+    background:white;
+
+    margin:20px;
+
+    border-radius:23px;
+
+    overflow:hidden;
+}
+
+.summary-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:22px 25px;
+
+    color:#2670ff;
+}
+
+.summary-title{
+    font-size:26px;
+    font-weight:500;
+}
+
+.month-link{
+    color:#2670ff;
+    font-size:19px;
+    text-decoration:underline;
+}
+
+.summary-row{
+    min-height:92px;
+
+    border-top:1px dashed #ddd;
+
+    padding:20px 28px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.summary-label{
+    font-size:19px;
+}
+
+.summary-value{
+    font-size:23px;
+    font-weight:500;
+}
+
+.blue{
+    color:#2670ff;
+}
+
+.red{
+    color:#ff4338;
+}
+
+.summary-more{
+    display:flex;
+    justify-content:center;
+
+    padding:0 0 20px;
+}
+
+.more-btn{
+    background:#e9edf0;
+
+    color:#211b52;
+
+    border-radius:25px;
+
+    padding:10px 25px;
+
+    font-size:17px;
+}
+
+
+/* ==============================
+   CALENDAR
+================================ */
+
+.calendar-section{
+    padding:0 20px;
+}
+
+.calendar-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    margin:22px 0 18px;
+}
+
+.calendar-title{
+    font-size:24px;
+    font-weight:500;
+}
+
+.calendar-detail{
+    color:#2670ff;
+    text-decoration:underline;
+    font-size:18px;
+}
+
+.weekdays{
+    display:grid;
+
+    grid-template-columns:
+        repeat(7,1fr);
+
+    text-align:center;
+
+    margin-bottom:10px;
+
+    font-size:18px;
+}
+
+.calendar-grid{
+    display:grid;
+
+    grid-template-columns:
+        repeat(7,1fr);
+
+    gap:6px;
+}
+
+.day{
+    min-height:72px;
+
+    border-radius:12px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    font-size:20px;
+
+    font-weight:500;
+
+    color:white;
+
+    position:relative;
+
+    cursor:pointer;
+
+    transition:.15s;
+}
+
+.day:active{
+    transform:scale(.94);
+}
+
+.day.work{
+    background:#8bc653;
+}
+
+.day.off{
+    background:#c9c5c6;
+}
+
+.day.today{
+    background:#625f7e;
+}
+
+.day.empty{
+    background:transparent;
+    cursor:default;
+}
+
+.day .dot{
+    position:absolute;
+
+    width:7px;
+    height:7px;
+
+    border-radius:50%;
+
+    bottom:7px;
+
+    background:white;
+}
+
+
+/* ==============================
+   BOTTOM BAR
+================================ */
+
+.bottom-bar{
+    position:fixed;
+
+    left:50%;
+    bottom:0;
+
+    transform:translateX(-50%);
+
+    width:min(600px,100%);
+
+    background:#eef8f8;
+
+    padding:12px 20px 18px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    z-index:20;
+}
+
+.bottom-message{
+    font-size:18px;
+}
+
+.bottom-check{
+    background:#6847ff;
+
+    color:white;
+
+    padding:15px 25px;
+
+    border-radius:20px;
+
+    font-size:18px;
+
+    box-shadow:
+        0 8px 20px rgba(104,71,255,.25);
+}
+
+
+/* ==============================
+   MODAL
+================================ */
+
+.modal-bg{
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.45);
+
+    z-index:100;
+
+    display:flex;
+
+    align-items:flex-end;
+
+    justify-content:center;
+}
+
+.modal{
+    width:min(600px,100%);
+
+    background:white;
+
+    border-radius:28px 28px 0 0;
+
+    padding:25px;
+
+    max-height:90vh;
+
+    overflow:auto;
+
+    animation:up .25s ease;
+}
+
+@keyframes up{
+    from{
+        transform:translateY(100%);
+    }
+    to{
+        transform:translateY(0);
+    }
+}
+
+.modal h2{
+    margin-bottom:20px;
+
+    font-size:24px;
+}
+
+.close-btn{
+    float:right;
+
+    width:38px;
+    height:38px;
+
+    border-radius:50%;
+
+    background:#eee;
+
+    font-size:20px;
+}
+
+.input{
+    width:100%;
+
+    padding:15px;
+
+    border:1px solid #ddd;
+
+    border-radius:14px;
+
+    font-size:17px;
+
+    margin-bottom:14px;
+
+    outline:none;
+}
+
+.primary{
+    width:100%;
+
+    padding:15px;
+
+    background:#6847ff;
+
+    color:white;
+
+    border-radius:15px;
+
+    font-size:17px;
+
+    font-weight:600;
+}
+
+
+/* ==============================
+   DAY ATTENDANCE
+================================ */
+
+.day-date{
+    text-align:center;
+
+    color:#2670ff;
+
+    font-size:20px;
+
+    margin-bottom:20px;
+}
+
+.time-row{
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:12px;
+}
+
+.time-card{
+    padding:20px;
+
+    background:#f5f7fa;
+
+    border-radius:18px;
+}
+
+.time-card span{
+    display:block;
+
+    color:#888;
+
+    margin-bottom:8px;
+}
+
+.time-card strong{
+    font-size:27px;
+}
+
+.action-row{
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:10px;
+
+    margin-top:15px;
+}
+
+.secondary{
+    padding:14px;
+
+    border-radius:14px;
+
+    background:#eee;
+
+    color:#211b52;
+
+    font-size:16px;
+}
+
+
+/* ==============================
+   APPENDIX
+================================ */
+
+.appendix-item{
+    padding:18px 5px;
+
+    border-bottom:1px solid #eee;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    font-size:18px;
+}
+
+.appendix-item strong{
+    color:#2670ff;
+}
+
+
+/* ==============================
+   RESPONSIVE
+================================ */
+
+@media(max-width:380px){
+
+    .tool{
+        font-size:13px;
+    }
+
+    .tool-icon{
+        width:54px;
+        height:54px;
+    }
+
+    .summary-title{
+        font-size:22px;
+    }
+
+    .summary-row{
+        padding:18px;
+    }
+
+    .summary-label{
+        font-size:17px;
+    }
+
+}
+
+</style>
 </head>
 
 <body>
 
 <div class="app">
 
-  <!-- HEADER -->
-  <header class="header">
+    <!-- =====================
+         LIST
+    ====================== -->
 
-    <div class="user">
-      <div class="avatar">ĐG</div>
+    <div id="listScreen">
 
-      <div>
-        <span>Xin chào 👋</span>
-        <h2>Đức Giang</h2>
-      </div>
-    </div>
+        <div class="list-header">
 
-    <button class="notification">
-      🔔
-    </button>
+            <div class="list-title">
+                Chấm công
+            </div>
 
-  </header>
+            <button
+                class="add-btn"
+                onclick="createBoard()">
+                +
+            </button>
 
+        </div>
 
-  <!-- CONTENT -->
-  <main>
-
-    <div class="date" id="currentDate"></div>
-
-    <h1>Hôm nay</h1>
-
-
-    <!-- ATTENDANCE CARD -->
-    <section class="attendance-card">
-
-      <div class="status" id="status">
-        <span></span>
-        Chưa chấm công
-      </div>
-
-      <div class="fingerprint">
-        👆
-      </div>
-
-      <p class="shift-title">
-        Ca làm việc
-      </p>
-
-      <div class="shift">
-        08:00 - 17:30
-      </div>
-
-
-      <button
-        class="attendance-btn"
-        id="attendanceBtn"
-        onclick="attendance()">
-
-        👆 CHẤM CÔNG VÀO
-
-      </button>
-
-    </section>
-
-
-    <!-- INFO -->
-    <div class="info-grid">
-
-      <div class="info-card">
-        <div class="icon">↪</div>
-        <span>Giờ vào</span>
-        <strong id="checkIn">--:--</strong>
-      </div>
-
-      <div class="info-card">
-        <div class="icon">↩</div>
-        <span>Giờ ra</span>
-        <strong id="checkOut">--:--</strong>
-      </div>
-
-      <div class="info-card">
-        <div class="icon">⏱</div>
-        <span>Tổng giờ</span>
-        <strong id="totalTime">0h 00m</strong>
-      </div>
-
-      <div class="info-card">
-        <div class="icon">📅</div>
-        <span>Ngày công</span>
-        <strong>22 ngày</strong>
-      </div>
+        <div
+            id="boardList"
+            class="board-list">
+        </div>
 
     </div>
 
 
-    <!-- RECENT -->
-    <section class="recent">
+    <!-- =====================
+         DETAIL
+    ====================== -->
 
-      <h3>Hoạt động gần đây</h3>
+    <div
+        id="detailScreen"
+        class="hidden">
 
-      <div class="activity">
+        <div class="detail-header">
 
-        <div class="activity-icon">
-          ↪
+            <button
+                class="back-btn"
+                onclick="showList()">
+                ‹
+            </button>
+
+            <div
+                id="detailName"
+                class="detail-name">
+            </div>
+
+            <button
+                class="settings-btn"
+                onclick="openSettings()">
+                ⚙
+            </button>
+
         </div>
 
-        <div>
-          <strong>Chấm công vào</strong>
-          <span id="recentIn">
-            Chưa chấm công
-          </span>
+
+        <!-- TOOLS -->
+
+        <div class="tools">
+
+            <button
+                class="tool"
+                onclick="openAppendix('Ứng lương')">
+
+                <div class="tool-icon">▣+</div>
+
+                Ứng lương
+
+            </button>
+
+
+            <button
+                class="tool"
+                onclick="openAppendix('Tăng ca')">
+
+                <div class="tool-icon">▣+</div>
+
+                Tăng ca
+
+            </button>
+
+
+            <button
+                class="tool"
+                onclick="openAppendix('Phụ cấp')">
+
+                <div class="tool-icon">♧</div>
+
+                Phụ cấp
+
+            </button>
+
+
+            <button
+                class="tool"
+                onclick="openAppendix('Trừ tiền')">
+
+                <div class="tool-icon">▣×</div>
+
+                Trừ tiền
+
+            </button>
+
+
+            <button
+                class="tool"
+                onclick="openAppendix('Lợi nhuận')">
+
+                <div class="tool-icon">＄</div>
+
+                Lợi nhuận
+
+            </button>
+
+
+            <button
+                class="tool"
+                onclick="openAppendix('Thanh toán')">
+
+                <div class="tool-icon">▭</div>
+
+                Thanh toán
+
+            </button>
+
+
+            <button
+                class="tool"
+                onclick="exportExcel()">
+
+                <div class="tool-icon">▧</div>
+
+                Xuất Excel
+
+            </button>
+
+
+            <button
+                class="tool"
+                onclick="openMore()">
+
+                <div class="tool-icon">•••</div>
+
+                Xem thêm
+
+            </button>
+
         </div>
 
-      </div>
+
+        <!-- SUMMARY -->
+
+        <div class="summary">
+
+            <div class="summary-head">
+
+                <div
+                    id="salaryTitle"
+                    class="summary-title">
+                    Tiền Công
+                </div>
+
+                <button
+                    class="month-link"
+                    onclick="changeMonth()">
+                    Tháng khác ›
+                </button>
+
+            </div>
 
 
-      <div class="activity">
+            <div class="summary-row">
 
-        <div class="activity-icon">
-          ↩
+                <div class="summary-label">
+                    Tổng lương
+                </div>
+
+                <div
+                    id="totalSalary"
+                    class="summary-value blue">
+                    0 đ
+                </div>
+
+            </div>
+
+
+            <div class="summary-row">
+
+                <div class="summary-label">
+                    Tổng đã ứng
+                </div>
+
+                <div
+                    id="totalAdvance"
+                    class="summary-value red">
+                    0 đ
+                </div>
+
+            </div>
+
+
+            <div class="summary-row">
+
+                <div class="summary-label">
+                    Tổng tiền trừ
+                </div>
+
+                <div
+                    id="totalDeduct"
+                    class="summary-value red">
+                    0 đ
+                </div>
+
+            </div>
+
+
+            <div class="summary-row">
+
+                <div class="summary-label">
+                    Tổng đã thanh toán
+                </div>
+
+                <div
+                    id="totalPaid"
+                    class="summary-value red">
+                    0 đ
+                </div>
+
+            </div>
+
+
+            <div class="summary-row">
+
+                <div class="summary-label">
+                    Tổng chưa nhận
+                </div>
+
+                <div
+                    id="totalRemain"
+                    class="summary-value">
+                    0 đ
+                </div>
+
+            </div>
+
+
+            <div class="summary-more">
+
+                <button
+                    class="more-btn"
+                    onclick="openMore()">
+                    Xem thêm⌄
+                </button>
+
+            </div>
+
         </div>
 
-        <div>
-          <strong>Chấm công ra</strong>
-          <span id="recentOut">
-            Chưa chấm công
-          </span>
+
+        <!-- CALENDAR -->
+
+        <div class="calendar-section">
+
+            <div class="calendar-head">
+
+                <div
+                    id="calendarTitle"
+                    class="calendar-title">
+                    Tháng 08/2026
+                </div>
+
+                <button
+                    class="calendar-detail"
+                    onclick="openCalendarDetail()">
+                    Xem chi tiết ›
+                </button>
+
+            </div>
+
+
+            <div class="weekdays">
+
+                <div>T2</div>
+                <div>T3</div>
+                <div>T4</div>
+                <div>T5</div>
+                <div>T6</div>
+                <div>T7</div>
+                <div>CN</div>
+
+            </div>
+
+
+            <div
+                id="calendar"
+                class="calendar-grid">
+            </div>
+
         </div>
 
-      </div>
-
-    </section>
-
-  </main>
-
-
-  <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
-
-    <button class="active">
-      🏠
-      <span>Trang chủ</span>
-    </button>
-
-    <button onclick="showMessage('Lịch chấm công')">
-      📅
-      <span>Lịch</span>
-    </button>
-
-    <button onclick="showMessage('Thống kê')">
-      📊
-      <span>Thống kê</span>
-    </button>
-
-    <button onclick="showMessage('Cá nhân')">
-      👤
-      <span>Cá nhân</span>
-    </button>
-
-  </nav>
+    </div>
 
 </div>
 
-<script src="app.js"></script>
+
+<!-- BOTTOM -->
+
+<div
+    id="bottomBar"
+    class="bottom-bar hidden">
+
+    <div
+        id="bottomMessage"
+        class="bottom-message">
+        Bạn chưa chấm công
+    </div>
+
+    <button
+        class="bottom-check"
+        onclick="openTodayAttendance()">
+        Chấm công　☝
+    </button>
+
+</div>
+
+
+<!-- MODAL -->
+
+<div
+    id="modalBg"
+    class="modal-bg hidden">
+
+    <div class="modal">
+
+        <button
+            class="close-btn"
+            onclick="closeModal()">
+            ×
+        </button>
+
+        <div id="modalContent"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================
+   DATA
+========================================= */
+
+let boards =
+    JSON.parse(
+        localStorage.getItem("attendanceBoards")
+    ) || [];
+
+let currentBoard = null;
+
+let currentMonth =
+    new Date().getMonth();
+
+let currentYear =
+    new Date().getFullYear();
+
+
+/* =========================================
+   INIT
+========================================= */
+
+if(boards.length === 0){
+
+    boards.push({
+        id:Date.now(),
+        name:"Sofa",
+        salary:8500000,
+        advance:0,
+        deduct:0,
+        allowance:0,
+        overtime:0,
+        paid:0,
+        attendance:{}
+    });
+
+    saveData();
+}
+
+renderBoards();
+
+
+/* =========================================
+   STORAGE
+========================================= */
+
+function saveData(){
+
+    localStorage.setItem(
+        "attendanceBoards",
+        JSON.stringify(boards)
+    );
+}
+
+
+/* =========================================
+   BOARD LIST
+========================================= */
+
+function renderBoards(){
+
+    const list =
+        document.getElementById("boardList");
+
+    list.innerHTML="";
+
+    boards.forEach(board=>{
+
+        const div =
+            document.createElement("div");
+
+        div.className="board-card";
+
+        div.onclick=()=>{
+            openBoard(board.id);
+        };
+
+        const days =
+            Object.keys(board.attendance || {}).length;
+
+        div.innerHTML=`
+
+            <div class="board-icon">
+                📋
+            </div>
+
+            <div class="board-info">
+
+                <h3>
+                    ${escapeHtml(board.name)}
+                </h3>
+
+                <p>
+                    ${days} ngày đã chấm công
+                </p>
+
+            </div>
+
+            <div class="board-arrow">
+                ›
+            </div>
+
+        `;
+
+        list.appendChild(div);
+
+    });
+
+}
+
+
+/* =========================================
+   CREATE BOARD
+========================================= */
+
+function createBoard(){
+
+    const name =
+        prompt(
+            "Nhập tên bảng chấm công:"
+        );
+
+    if(!name || !name.trim()){
+        return;
+    }
+
+    const salary =
+        prompt(
+            "Nhập lương cơ bản:",
+            "8500000"
+        );
+
+    const board = {
+
+        id:Date.now(),
+
+        name:name.trim(),
+
+        salary:
+            Number(salary) || 0,
+
+        advance:0,
+
+        deduct:0,
+
+        allowance:0,
+
+        overtime:0,
+
+        paid:0,
+
+        attendance:{}
+
+    };
+
+    boards.push(board);
+
+    saveData();
+
+    renderBoards();
+
+}
+
+
+/* =========================================
+   OPEN BOARD
+========================================= */
+
+function openBoard(id){
+
+    currentBoard =
+        boards.find(
+            b=>b.id===id
+        );
+
+    if(!currentBoard){
+        return;
+    }
+
+    document
+        .getElementById("listScreen")
+        .classList.add("hidden");
+
+    document
+        .getElementById("detailScreen")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("bottomBar")
+        .classList.remove("hidden");
+
+    document
+        .getElementById("detailName")
+        .innerText =
+            currentBoard.name;
+
+    renderCalendar();
+
+    updateSummary();
+
+}
+
+
+/* =========================================
+   BACK
+========================================= */
+
+function showList(){
+
+    document
+        .getElementById("detailScreen")
+        .classList.add("hidden");
+
+    document
+        .getElementById("bottomBar")
+        .classList.add("hidden");
+
+    document
+        .getElementById("listScreen")
+        .classList.remove("hidden");
+
+    renderBoards();
+
+}
+
+
+/* =========================================
+   CALENDAR
+========================================= */
+
+function renderCalendar(){
+
+    const calendar =
+        document.getElementById(
+            "calendar"
+        );
+
+    calendar.innerHTML="";
+
+    const title =
+        document.getElementById(
+            "calendarTitle"
+        );
+
+    title.innerText =
+        `Tháng ${String(currentMonth+1).padStart(2,"0")}/${currentYear}`;
+
+
+    const first =
+        new Date(
+            currentYear,
+            currentMonth,
+            1
+        );
+
+    let start =
+        first.getDay();
+
+    start =
+        start===0
+            ? 6
+            : start-1;
+
+    const days =
+        new Date(
+            currentYear,
+            currentMonth+1,
+            0
+        ).getDate();
+
+
+    for(let i=0;i<start;i++){
+
+        const empty =
+            document.createElement("div");
+
+        empty.className="day empty";
+
+        calendar.appendChild(empty);
+
+    }
+
+
+    const today =
+        new Date();
+
+
+    for(let day=1;day<=days;day++){
+
+        const div =
+            document.createElement("div");
+
+        const key =
+            dateKey(
+                currentYear,
+                currentMonth,
+                day
+            );
+
+        const record =
+            currentBoard.attendance[key];
+
+
+        div.className="day";
+
+
+        if(record){
+
+            div.classList.add("work");
+
+        }else{
+
+            const date =
+                new Date(
+                    currentYear,
+                    currentMonth,
+                    day
+                );
+
+            if(
+                date.getDay()===0
+                ||
+                date.getDay()===6
+            ){
+
+                div.classList.add("off");
+
+            }else{
+
+                div.classList.add("work");
+
+            }
+
+        }
+
+
+        if(
+            today.getDate()===day
+            &&
+            today.getMonth()===currentMonth
+            &&
+            today.getFullYear()===currentYear
+        ){
+
+            div.classList.remove("work");
+            div.classList.add("today");
+
+        }
+
+
+        div.innerText=day;
+
+        if(record){
+
+            const dot =
+                document.createElement("span");
+
+            dot.className="dot";
+
+            div.appendChild(dot);
+
+        }
+
+
+        div.onclick=()=>{
+            openDay(day);
+        };
+
+
+        calendar.appendChild(div);
+
+    }
+
+}
+
+
+/* =========================================
+   DATE KEY
+========================================= */
+
+function dateKey(
+    year,
+    month,
+    day
+){
+
+    return `${year}-${String(month+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+
+}
+
+
+/* =========================================
+   OPEN DAY
+========================================= */
+
+function openDay(day){
+
+    const key =
+        dateKey(
+            currentYear,
+            currentMonth,
+            day
+        );
+
+    const record =
+        currentBoard.attendance[key]
+        ||
+        {
+            in:"",
+            out:""
+        };
+
+
+    openModal(`
+
+        <div class="day-date">
+            ${day}/${currentMonth+1}/${currentYear}
+        </div>
+
+        <h2>
+            Chấm công
+        </h2>
+
+        <div class="time-row">
+
+            <div class="time-card">
+
+                <span>
+                    Giờ vào
+                </span>
+
+                <strong>
+                    ${record.in || "--:--"}
+                </strong>
+
+            </div>
+
+            <div class="time-card">
+
+                <span>
+                    Giờ ra
+                </span>
+
+                <strong>
+                    ${record.out || "--:--"}
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="action-row">
+
+            <button
+                class="primary"
+                onclick="setCheckIn('${key}')">
+                Chấm vào
+            </button>
+
+            <button
+                class="secondary"
+                onclick="setCheckOut('${key}')">
+                Chấm ra
+            </button>
+
+        </div>
+
+
+        <br>
+
+        <button
+            class="secondary"
+            style="width:100%"
+            onclick="openDayDetail('${key}')">
+
+            Xem chi tiết ngày
+
+        </button>
+
+    `);
+
+}
+
+
+/* =========================================
+   CHECK IN
+========================================= */
+
+function setCheckIn(key){
+
+    const now =
+        new Date();
+
+    const time =
+        now.toLocaleTimeString(
+            "vi-VN",
+            {
+                hour:"2-digit",
+                minute:"2-digit"
+            }
+        );
+
+    if(
+        !currentBoard.attendance[key]
+    ){
+
+        currentBoard.attendance[key]={
+            in:"",
+            out:""
+        };
+
+    }
+
+    currentBoard.attendance[key].in =
+        time;
+
+    saveData();
+
+    closeModal();
+
+    renderCalendar();
+
+    updateSummary();
+
+}
+
+
+/* =========================================
+   CHECK OUT
+========================================= */
+
+function setCheckOut(key){
+
+    const now =
+        new Date();
+
+    const time =
+        now.toLocaleTimeString(
+            "vi-VN",
+            {
+                hour:"2-digit",
+                minute:"2-digit"
+            }
+        );
+
+    if(
+        !currentBoard.attendance[key]
+    ){
+
+        currentBoard.attendance[key]={
+            in:"",
+            out:""
+        };
+
+    }
+
+    currentBoard.attendance[key].out =
+        time;
+
+    saveData();
+
+    closeModal();
+
+    renderCalendar();
+
+    updateSummary();
+
+}
+
+
+/* =========================================
+   TODAY
+========================================= */
+
+function openTodayAttendance(){
+
+    const now =
+        new Date();
+
+    currentMonth =
+        now.getMonth();
+
+    currentYear =
+        now.getFullYear();
+
+    renderCalendar();
+
+    openDay(
+        now.getDate()
+    );
+
+}
+
+
+/* =========================================
+   SUMMARY
+========================================= */
+
+function updateSummary(){
+
+    if(!currentBoard){
+        return;
+    }
+
+    const salary =
+        Number(currentBoard.salary)||0;
+
+    const advance =
+        Number(currentBoard.advance)||0;
+
+    const deduct =
+        Number(currentBoard.deduct)||0;
+
+    const allowance =
+        Number(currentBoard.allowance)||0;
+
+    const overtime =
+        Number(currentBoard.overtime)||0;
+
+    const paid =
+        Number(currentBoard.paid)||0;
+
+
+    const total =
+        salary +
+        allowance +
+        overtime;
+
+
+    const remain =
+        total -
+        advance -
+        deduct -
+        paid;
+
+
+    document.getElementById(
+        "totalSalary"
+    ).innerText =
+        money(total);
+
+    document.getElementById(
+        "totalAdvance"
+    ).innerText =
+        money(advance);
+
+    document.getElementById(
+        "totalDeduct"
+    ).innerText =
+        money(deduct);
+
+    document.getElementById(
+        "totalPaid"
+    ).innerText =
+        money(paid);
+
+    document.getElementById(
+        "totalRemain"
+    ).innerText =
+        money(remain);
+
+}
+
+
+/* =========================================
+   MONEY
+========================================= */
+
+function money(value){
+
+    return Number(value)
+        .toLocaleString("vi-VN")
+        + " đ";
+
+}
+
+
+/* =========================================
+   APPENDIX
+========================================= */
+
+function openAppendix(type){
+
+    openModal(`
+
+        <h2>
+            ${type}
+        </h2>
+
+        <input
+            id="moneyInput"
+            class="input"
+            type="number"
+            placeholder="Nhập số tiền">
+
+        <input
+            id="noteInput"
+            class="input"
+            placeholder="Ghi chú">
+
+        <button
+            class="primary"
+            onclick="saveAppendix('${type}')">
+
+            Lưu
+
+        </button>
+
+    `);
+
+}
+
+
+function saveAppendix(type){
+
+    const amount =
+        Number(
+            document.getElementById(
+                "moneyInput"
+            ).value
+        ) || 0;
+
+
+    if(type==="Ứng lương"){
+        currentBoard.advance += amount;
+    }
+
+    if(type==="Trừ tiền"){
+        currentBoard.deduct += amount;
+    }
+
+    if(type==="Phụ cấp"){
+        currentBoard.allowance += amount;
+    }
+
+    if(type==="Tăng ca"){
+        currentBoard.overtime += amount;
+    }
+
+    if(type==="Thanh toán"){
+        currentBoard.paid += amount;
+    }
+
+
+    saveData();
+
+    closeModal();
+
+    updateSummary();
+
+}
+
+
+/* =========================================
+   MORE
+========================================= */
+
+function openMore(){
+
+    openModal(`
+
+        <h2>
+            Phụ lục
+        </h2>
+
+        <div class="appendix-item">
+            Lương cơ bản
+            <strong>
+                ${money(currentBoard.salary)}
+            </strong>
+        </div>
+
+        <div class="appendix-item">
+            Phụ cấp
+            <strong>
+                ${money(currentBoard.allowance)}
+            </strong>
+        </div>
+
+        <div class="appendix-item">
+            Tăng ca
+            <strong>
+                ${money(currentBoard.overtime)}
+            </strong>
+        </div>
+
+        <div class="appendix-item">
+            Đã ứng
+            <strong>
+                ${money(currentBoard.advance)}
+            </strong>
+        </div>
+
+        <div class="appendix-item">
+            Trừ tiền
+            <strong>
+                ${money(currentBoard.deduct)}
+            </strong>
+        </div>
+
+        <div class="appendix-item">
+            Đã thanh toán
+            <strong>
+                ${money(currentBoard.paid)}
+            </strong>
+        </div>
+
+    `);
+
+}
+
+
+/* =========================================
+   SETTINGS
+========================================= */
+
+function openSettings(){
+
+    openModal(`
+
+        <h2>
+            Cài đặt bảng
+        </h2>
+
+        <input
+            id="newName"
+            class="input"
+            value="${escapeAttr(currentBoard.name)}">
+
+        <input
+            id="newSalary"
+            class="input"
+            type="number"
+            value="${currentBoard.salary}">
+
+        <button
+            class="primary"
+            onclick="saveSettings()">
+
+            Lưu thay đổi
+
+        </button>
+
+        <br><br>
+
+        <button
+            class="secondary"
+            style="width:100%;color:#ff4338"
+            onclick="deleteBoard()">
+
+            Xóa bảng chấm công
+
+        </button>
+
+    `);
+
+}
+
+
+function saveSettings(){
+
+    currentBoard.name =
+        document.getElementById(
+            "newName"
+        ).value.trim();
+
+    currentBoard.salary =
+        Number(
+            document.getElementById(
+                "newSalary"
+            ).value
+        ) || 0;
+
+
+    saveData();
+
+    document.getElementById(
+        "detailName"
+    ).innerText =
+        currentBoard.name;
+
+    closeModal();
+
+    renderBoards();
+
+    updateSummary();
+
+}
+
+
+function deleteBoard(){
+
+    if(
+        !confirm(
+            "Bạn có chắc muốn xóa bảng này?"
+        )
+    ){
+        return;
+    }
+
+    boards =
+        boards.filter(
+            b=>b.id!==currentBoard.id
+        );
+
+    saveData();
+
+    currentBoard=null;
+
+    closeModal();
+
+    showList();
+
+}
+
+
+/* =========================================
+   MONTH
+========================================= */
+
+function changeMonth(){
+
+    currentMonth++;
+
+    if(currentMonth>11){
+
+        currentMonth=0;
+        currentYear++;
+
+    }
+
+    renderCalendar();
+
+}
+
+
+/* =========================================
+   CALENDAR DETAIL
+========================================= */
+
+function openCalendarDetail(){
+
+    openModal(`
+
+        <h2>
+            Chi tiết tháng
+        </h2>
+
+        <p>
+            Bảng: ${escapeHtml(currentBoard.name)}
+        </p>
+
+        <br>
+
+        <p>
+            Số ngày đã chấm:
+            <strong>
+                ${Object.keys(currentBoard.attendance).length}
+            </strong>
+        </p>
+
+        <br>
+
+        <p>
+            Tổng tiền:
+            <strong>
+                ${money(
+                    currentBoard.salary +
+                    currentBoard.allowance +
+                    currentBoard.overtime
+                )}
+            </strong>
+        </p>
+
+    `);
+
+}
+
+
+/* =========================================
+   DAY DETAIL
+========================================= */
+
+function openDayDetail(key){
+
+    const record =
+        currentBoard.attendance[key];
+
+    if(!record){
+
+        alert(
+            "Ngày này chưa có dữ liệu."
+        );
+
+        return;
+
+    }
+
+    openModal(`
+
+        <h2>
+            Chi tiết chấm công
+        </h2>
+
+        <div class="appendix-item">
+            Ngày
+            <strong>
+                ${key}
+            </strong>
+        </div>
+
+        <div class="appendix-item">
+            Giờ vào
+            <strong>
+                ${record.in || "--:--"}
+            </strong>
+        </div>
+
+        <div class="appendix-item">
+            Giờ ra
+            <strong>
+                ${record.out || "--:--"}
+            </strong>
+        </div>
+
+    `);
+
+}
+
+
+/* =========================================
+   EXCEL
+========================================= */
+
+function exportExcel(){
+
+    let csv =
+        "Ngày,Giờ vào,Giờ ra\n";
+
+    Object.entries(
+        currentBoard.attendance
+    ).forEach(
+        ([date,record])=>{
+
+            csv +=
+                `${date},${record.in || ""},${record.out || ""}\n`;
+
+        }
+    );
+
+
+    const blob =
+        new Blob(
+            [
+                "\ufeff" + csv
+            ],
+            {
+                type:
+                    "text/csv;charset=utf-8;"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const a =
+        document.createElement("a");
+
+    a.href=url;
+
+    a.download =
+        currentBoard.name
+        + "-cham-cong.csv";
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+}
+
+
+/* =========================================
+   MODAL
+========================================= */
+
+function openModal(content){
+
+    document.getElementById(
+        "modalContent"
+    ).innerHTML=content;
+
+    document.getElementById(
+        "modalBg"
+    ).classList.remove("hidden");
+
+}
+
+
+function closeModal(){
+
+    document.getElementById(
+        "modalBg"
+    ).classList.add("hidden");
+
+}
+
+
+/* =========================================
+   ESCAPE
+========================================= */
+
+function escapeHtml(text){
+
+    return String(text)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+function escapeAttr(text){
+
+    return escapeHtml(text);
+
+}
+
+</script>
 
 </body>
 </html>
