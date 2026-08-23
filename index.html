@@ -1361,6 +1361,17 @@ button{
 }
 
 
+/* Mobile screen flow: mỗi màn hình bắt đầu từ đầu viewport */
+html, body{
+    scroll-behavior:auto;
+    overflow-x:hidden;
+}
+
+.app{
+    position:relative;
+    overflow-x:hidden;
+}
+
 /* BOTTOM NAV + CLOUD ACCOUNT */
 .bottom-nav{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(600px,100%);height:68px;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-top:1px solid rgba(35,31,95,.08);display:flex;align-items:stretch;justify-content:space-around;z-index:50;box-shadow:0 -5px 20px rgba(35,31,95,.06)}
 .nav-btn{flex:1;background:none;color:#85829a;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:600}
@@ -1381,106 +1392,15 @@ button{
 .login-note{margin:28px auto 0;max-width:340px;color:#8a8a8a;font-size:13px;line-height:1.5}.login-footer{margin-top:34px;color:#777;font-size:12px;line-height:1.5}.login-footer strong{color:#5841d8}.app.auth-hidden{display:none!important}
 @media(max-width:480px){.login-screen{padding:32px 22px 24px}.login-logo{width:88px;height:88px;border-radius:22px}.login-title{font-size:32px}.login-subtitle{font-size:16px;margin-bottom:30px}}
 
-/* =========================================================
-   MOBILE UI COMPACT - DG CHAM CONG
-   Tối ưu giao diện theo chiều rộng điện thoại, giảm cỡ chữ
-   nhưng vẫn giữ kích thước tiêu đề/lịch đủ dễ nhìn.
-========================================================= */
-html{
-    width:100%;
-    overflow-x:hidden;
+/* Fix: Data/Account screens are outside .app in the current DOM.
+   When Home is hidden, .app must not keep a full viewport blank space. */
+.app.screen-only{
+    min-height:0 !important;
+    height:0 !important;
+    padding:0 !important;
+    margin:0 !important;
+    overflow:visible !important;
 }
-
-body{
-    width:100%;
-    min-width:0;
-    overflow-x:hidden;
-    font-size:12px;
-}
-
-.app{
-    width:100%;
-    max-width:430px;
-    min-height:100dvh;
-    margin:0 auto;
-    padding-bottom:82px;
-    overflow-x:hidden;
-    font-size:12px;
-}
-
-/* Nội dung bên trong không được tạo chiều rộng kiểu desktop */
-.app *,
-.modal,
-.modal-content{
-    max-width:100%;
-}
-
-input,
-select,
-textarea,
-button{
-    font-size:12px;
-}
-
-input,
-select,
-textarea{
-    max-width:100%;
-}
-
-/* Cỡ chữ chuẩn */
-.app p,
-.app span,
-.app label,
-.app li,
-.app td,
-.app th,
-.app .input,
-.app .secondary,
-.app .primary{
-    font-size:12px;
-}
-
-/* Giữ tiêu đề phân cấp, không để mọi thứ thành chữ quá nhỏ */
-.app h1{font-size:20px;}
-.app h2{font-size:17px;}
-.app h3{font-size:14px;}
-
-.app .day{
-    font-size:16px;
-}
-
-/* Card và khu vực nội dung sát mép điện thoại hơn */
-@media(max-width:430px){
-    .app{
-        max-width:100%;
-    }
-
-    .container,
-    .section,
-    .card{
-        max-width:100%;
-    }
-}
-
-/* Trên màn hình lớn vẫn mô phỏng đúng một app điện thoại,
-   không kéo giao diện thành web rộng */
-@media(min-width:431px){
-    body{
-        display:flex;
-        justify-content:center;
-        align-items:flex-start;
-        background:#dfeeee;
-    }
-
-    .app{
-        width:430px;
-        min-height:100dvh;
-        background:#fff;
-        box-shadow:0 0 28px rgba(0,0,0,.08);
-    }
-}
-
 </style>
     <meta name="attendance-app-version" content="2026-08-23-google-redirect-v1">
     <link rel="icon" type="image/png" href="logo.webp">
@@ -2076,6 +1996,15 @@ textarea{
     } catch (e) {}
     if (login) login.style.display = "none";
     if (app) app.classList.remove("auth-hidden");
+    const nav = document.getElementById("bottomNav");
+    if (nav) nav.classList.remove("hidden");
+    try {
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+      window.scrollTo({top:0,left:0,behavior:"instant"});
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    } catch(e) { window.scrollTo(0,0); }
+    if (window.__refreshAccountScreen) window.__refreshAccountScreen();
   }
 
   window.loginWithGoogle = async function () {
@@ -5118,7 +5047,22 @@ function escapeAttr(text){
 
 
 
-function showMainApp(){const login=document.getElementById("loginScreen");const app=document.querySelector(".app");const nav=document.getElementById("bottomNav");if(login)login.style.display="none";if(app)app.classList.remove("auth-hidden");if(nav)nav.classList.remove("hidden");if(window.__refreshAccountScreen)window.__refreshAccountScreen();}
+function showMainApp(){
+    const login=document.getElementById("loginScreen");
+    document.querySelector(".app")?.classList.remove("screen-only");
+    const app=document.querySelector(".app");
+    const nav=document.getElementById("bottomNav");
+    if(login)login.style.display="none";
+    if(app)app.classList.remove("auth-hidden");
+    if(nav)nav.classList.remove("hidden");
+    try{
+        if("scrollRestoration" in history) history.scrollRestoration = "manual";
+        window.scrollTo({top:0,left:0,behavior:"instant"});
+        document.documentElement.scrollTop=0;
+        document.body.scrollTop=0;
+    }catch(e){window.scrollTo(0,0)}
+    if(window.__refreshAccountScreen)window.__refreshAccountScreen();
+}
 function loginAsGuest(){try{localStorage.setItem("dgAuthSession",JSON.stringify({type:"guest",loggedIn:true,at:Date.now()}))}catch(e){}showMainApp()}
 // loginWithGoogle được Firebase module ở phía trên cung cấp.
 function loginWithFacebook(){alert("Đăng nhập Facebook chưa được kết nối Firebase. Giao diện đã sẵn sàng; bước tiếp theo sẽ kết nối tài khoản Facebook và đồng bộ dữ liệu lên đám mây.")}
@@ -5132,6 +5076,24 @@ function hideAppScreens(){
     document.getElementById("bottomBar")?.classList.add("hidden");
 }
 function navigateApp(screen){
+    const appShell = document.querySelector(".app");
+    // Data/Account nằm ngoài .app nên khi mở 2 màn hình này,
+    // không để .app giữ lại một khoảng trống cao bằng 1 viewport.
+    if(appShell){
+        appShell.classList.toggle("screen-only", screen === "data" || screen === "account");
+    }
+    // Mỗi lần chuyển tab phải đưa giao diện về đầu trang.
+    // Nếu giữ scrollTop của màn hình trước, màn hình mới có thể bị trống
+    // và người dùng phải kéo xuống mới thấy nội dung.
+    try{
+        if("scrollRestoration" in history) history.scrollRestoration = "manual";
+        window.scrollTo({top:0, left:0, behavior:"instant"});
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    }catch(e){
+        window.scrollTo(0,0);
+    }
+
     hideAppScreens();
     document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active", b.dataset.screen===screen));
     if(screen==="home"){
