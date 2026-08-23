@@ -343,6 +343,33 @@ button{
    CALENDAR
 ================================ */
 
+/* Thanh điều hướng tháng */
+.calendar-month-nav{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-width:0;
+}
+
+.month-arrow{
+    width:40px;
+    height:40px;
+    flex:0 0 40px;
+    border-radius:12px;
+    background:white;
+    color:#211b52;
+    font-size:27px;
+    line-height:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-shadow:0 4px 12px rgba(0,0,0,.07);
+}
+
+.month-arrow:active{
+    transform:scale(.94);
+}
+
 .calendar-section{
     padding:0 20px;
 }
@@ -351,13 +378,14 @@ button{
     display:flex;
     align-items:center;
     justify-content:space-between;
-
+    gap:8px;
     margin:22px 0 18px;
 }
 
 .calendar-title{
     font-size:24px;
     font-weight:500;
+    white-space:nowrap;
 }
 
 .calendar-detail{
@@ -463,8 +491,120 @@ button{
 }
 
 /* ==============================
+   OVERTIME LOG
+================================ */
+
+.overtime-summary{
+    background:#eeeaff;
+    border-radius:18px;
+    padding:16px;
+    margin:14px 0 18px;
+}
+
+.overtime-summary-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:5px 0;
+}
+
+.overtime-summary-row strong{
+    color:#6847ff;
+}
+
+.overtime-log{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    max-height:48vh;
+    overflow:auto;
+}
+
+.overtime-log-item{
+    background:#f7f8fa;
+    border:1px solid #e9e9ee;
+    border-radius:16px;
+    padding:14px;
+    cursor:pointer;
+}
+
+.overtime-log-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:7px;
+}
+
+.overtime-log-date{
+    font-weight:700;
+    color:#211b52;
+}
+
+.overtime-log-money{
+    font-weight:700;
+    color:#2670ff;
+}
+
+.overtime-log-detail{
+    color:#777;
+    font-size:14px;
+    line-height:1.5;
+}
+
+
+/* ==============================
    NEW ATTENDANCE OPTIONS
 ================================ */
+
+/* Lựa chọn giờ tăng ca */
+.overtime-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin:10px 0 20px;
+}
+
+.overtime-option{
+    min-height:52px;
+    border:2px solid #eeeeee;
+    background:#f7f8fa;
+    border-radius:14px;
+    color:#211b52;
+    font-size:16px;
+    font-weight:600;
+}
+
+.overtime-option.selected{
+    border-color:#6847ff;
+    background:#eeeaff;
+    color:#6847ff;
+}
+
+/* Lựa chọn hệ số tăng ca */
+.coefficient-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin:10px 0 20px;
+}
+
+.coefficient-option{
+    min-height:52px;
+    border:2px solid #eeeeee;
+    background:#f7f8fa;
+    border-radius:14px;
+    color:#211b52;
+    font-size:16px;
+    font-weight:600;
+}
+
+.coefficient-option.selected{
+    border-color:#6847ff;
+    background:#eeeaff;
+    color:#6847ff;
+}
 
 .work-options{
     display:grid;
@@ -876,7 +1016,7 @@ button{
 
             <button
                 class="tool"
-                onclick="openAppendix('Tăng ca')">
+                onclick="openOvertimeLog()">
 
                 <div class="tool-icon">▣+</div>
 
@@ -967,7 +1107,7 @@ button{
 
                 <button
                     class="month-link"
-                    onclick="changeMonth()">
+                    onclick="openMonthPicker()">
                     Tháng khác ›
                 </button>
 
@@ -1068,10 +1208,28 @@ button{
 
             <div class="calendar-head">
 
-                <div
-                    id="calendarTitle"
-                    class="calendar-title">
-                    Tháng 08/2026
+                <div class="calendar-month-nav">
+
+                    <button
+                        class="month-arrow"
+                        onclick="changeMonth(-1)"
+                        aria-label="Tháng trước">
+                        «
+                    </button>
+
+                    <div
+                        id="calendarTitle"
+                        class="calendar-title">
+                        Tháng 08/2026
+                    </div>
+
+                    <button
+                        class="month-arrow"
+                        onclick="changeMonth(1)"
+                        aria-label="Tháng sau">
+                        »
+                    </button>
+
                 </div>
 
                 <button
@@ -1203,6 +1361,11 @@ boards.forEach(board => {
     Object.values(board.attendance || {}).forEach(record => {
         if(record.overtimeHours === undefined){
             record.overtimeHours = 0;
+        }
+
+        if(record.overtimeRate === undefined){
+            record.overtimeRate =
+                Number(board.overtimeRate) || 1.5;
         }
     });
 });
@@ -1605,9 +1768,58 @@ function openDay(day){
         overtimeHours:
             Number(oldRecord.overtimeHours) || 0,
 
+        overtimeRate:
+            Number(oldRecord.overtimeRate)
+                || Number(currentBoard.overtimeRate)
+                || 1.5,
+
         note:
             oldRecord.note || ""
     };
+
+    const overtimeHours = [];
+    for(let h = 1; h <= 12; h += 0.5){
+        overtimeHours.push(h);
+    }
+
+    const overtimeLabels =
+        overtimeHours.map(h => {
+            const label =
+                Number.isInteger(h)
+                    ? `${h} giờ`
+                    : `${String(h).replace(".", ",")} giờ`;
+
+            return `
+                <button
+                    type="button"
+                    class="overtime-option ${record.overtimeHours === h ? "selected" : ""}"
+                    onclick="selectOvertimeHours(${h})">
+                    ${label}
+                </button>
+            `;
+        }).join("");
+
+    const coefficients = [
+        1, 1.5, 2, 2.5, 3,
+        3.5, 4, 4.5, 5
+    ];
+
+    const coefficientLabels =
+        coefficients.map(rate => {
+
+            const label =
+                `X${String(rate).replace(".", ",")}`;
+
+            return `
+                <button
+                    type="button"
+                    class="coefficient-option ${record.overtimeRate === rate ? "selected" : ""}"
+                    onclick="selectOvertimeRate(${rate})">
+                    ${label}
+                </button>
+            `;
+
+        }).join("");
 
     openModal(`
 
@@ -1655,23 +1867,37 @@ function openDay(day){
             Giờ tăng ca
         </div>
 
-        <input
-            id="overtimeHours"
-            class="input"
-            type="number"
-            min="0"
-            step="0.5"
-            value="${record.overtimeHours}"
-            placeholder="Ví dụ: 2">
+        <div
+            id="overtimeHoursGrid"
+            class="overtime-grid">
 
-        <div style="
-            color:#888;
-            font-size:14px;
-            margin-top:-6px;
-            margin-bottom:18px;
-        ">
-            Nhập số giờ tăng ca trong ngày
+            ${overtimeLabels}
+
         </div>
+
+        <input
+            type="hidden"
+            id="selectedOvertimeHours"
+            value="${record.overtimeHours}">
+
+
+        <div class="note-title">
+            Hệ số tăng ca
+        </div>
+
+        <div
+            id="overtimeRateGrid"
+            class="coefficient-grid">
+
+            ${coefficientLabels}
+
+        </div>
+
+        <input
+            type="hidden"
+            id="selectedOvertimeRate"
+            value="${record.overtimeRate}">
+
 
         <div class="note-title">
             Ghi chú
@@ -1682,11 +1908,6 @@ function openDay(day){
             class="note-input"
             placeholder="Nhập ghi chú..."
             rows="4">${escapeHtml(record.note)}</textarea>
-
-        <input
-            type="hidden"
-            id="selectedWorkType"
-            value="${record.status || ""}">
 
         <button
             class="primary"
@@ -1729,6 +1950,78 @@ function selectWorkType(type){
 }
 
 
+function selectOvertimeHours(hours){
+
+    document.getElementById(
+        "selectedOvertimeHours"
+    ).value = hours;
+
+    document
+        .querySelectorAll(".overtime-option")
+        .forEach(btn => {
+            btn.classList.remove("selected");
+        });
+
+    const buttons =
+        document.querySelectorAll(
+            ".overtime-option"
+        );
+
+    buttons.forEach(btn => {
+
+        const value =
+            Number(
+                btn.innerText
+                    .replace("giờ","")
+                    .replace(",",".")
+                    .trim()
+            );
+
+        if(value === hours){
+            btn.classList.add("selected");
+        }
+
+    });
+
+}
+
+
+function selectOvertimeRate(rate){
+
+    document.getElementById(
+        "selectedOvertimeRate"
+    ).value = rate;
+
+    document
+        .querySelectorAll(".coefficient-option")
+        .forEach(btn => {
+            btn.classList.remove("selected");
+        });
+
+    const buttons =
+        document.querySelectorAll(
+            ".coefficient-option"
+        );
+
+    buttons.forEach(btn => {
+
+        const value =
+            Number(
+                btn.innerText
+                    .replace("X","")
+                    .replace(",",".")
+                    .trim()
+            );
+
+        if(value === rate){
+            btn.classList.add("selected");
+        }
+
+    });
+
+}
+
+
 function saveAttendance(key){
 
     const type =
@@ -1743,9 +2036,19 @@ function saveAttendance(key){
             0,
             Number(
                 document.getElementById(
-                    "overtimeHours"
+                    "selectedOvertimeHours"
                 ).value
             ) || 0
+        );
+
+    const overtimeRate =
+        Math.max(
+            1,
+            Number(
+                document.getElementById(
+                    "selectedOvertimeRate"
+                ).value
+            ) || 1.5
         );
 
     const note =
@@ -1765,6 +2068,7 @@ function saveAttendance(key){
     currentBoard.attendance[key] = {
         status:type,
         overtimeHours:overtimeHours,
+        overtimeRate:overtimeRate,
         note:note
     };
 
@@ -1894,12 +2198,20 @@ function updateSummary(){
                     Number(record.overtimeHours) || 0
                 );
 
+            const dayOvertimeRate =
+                Math.max(
+                    1,
+                    Number(record.overtimeRate)
+                        || overtimeRate
+                        || 1.5
+                );
+
             totalOvertimeHours += ot;
 
             earnedOvertime +=
                 hourlyRate *
                 ot *
-                overtimeRate;
+                dayOvertimeRate;
 
         }
     );
@@ -1986,6 +2298,221 @@ function money(value){
 /* =========================================
    APPENDIX
 ========================================= */
+
+function openOvertimeLog(){
+
+    if(!currentBoard){
+        return;
+    }
+
+    const monthPrefix =
+        `${currentYear}-${String(currentMonth+1).padStart(2,"0")}-`;
+
+    const salary =
+        Number(currentBoard.salary) || 0;
+
+    const standardDays =
+        Number(currentBoard.standardDays) || 26;
+
+    const hoursPerDay =
+        Number(currentBoard.hoursPerDay) || 8;
+
+    const defaultRate =
+        Number(currentBoard.overtimeRate) || 1.5;
+
+    const dailyRate =
+        salary / standardDays;
+
+    const hourlyRate =
+        dailyRate / hoursPerDay;
+
+    const records = [];
+
+    Object.entries(
+        currentBoard.attendance || {}
+    ).forEach(([date, record]) => {
+
+        if(!date.startsWith(monthPrefix)){
+            return;
+        }
+
+        const hours =
+            Number(record.overtimeHours) || 0;
+
+        if(hours <= 0){
+            return;
+        }
+
+        const rate =
+            Math.max(
+                1,
+                Number(record.overtimeRate)
+                    || defaultRate
+            );
+
+        const moneyValue =
+            hours *
+            hourlyRate *
+            rate;
+
+        const dateObj =
+            new Date(`${date}T00:00:00`);
+
+        const weekday =
+            [
+                "Chủ nhật",
+                "Thứ 2",
+                "Thứ 3",
+                "Thứ 4",
+                "Thứ 5",
+                "Thứ 6",
+                "Thứ 7"
+            ][dateObj.getDay()];
+
+        records.push({
+            date,
+            weekday,
+            hours,
+            rate,
+            money:moneyValue,
+            note:record.note || ""
+        });
+
+    });
+
+    records.sort(
+        (a,b)=>a.date.localeCompare(b.date)
+    );
+
+    const totalHours =
+        records.reduce(
+            (sum,item)=>sum + item.hours,
+            0
+        );
+
+    const totalMoney =
+        records.reduce(
+            (sum,item)=>sum + item.money,
+            0
+        );
+
+    const listHtml =
+        records.length
+            ? records.map(item=>`
+
+                <div
+                    class="overtime-log-item"
+                    onclick="openDayDetail('${item.date}')">
+
+                    <div class="overtime-log-head">
+
+                        <div class="overtime-log-date">
+                            ${formatDateVN(item.date)}
+                            · ${item.weekday}
+                        </div>
+
+                        <div class="overtime-log-money">
+                            ${money(item.money)}
+                        </div>
+
+                    </div>
+
+                    <div class="overtime-log-detail">
+                        Tăng ca: <strong>${formatHours(item.hours)}</strong>
+                        · Hệ số: <strong>X${String(item.rate).replace(".", ",")}</strong>
+                    </div>
+
+                    ${
+                        item.note
+                            ? `
+                                <div
+                                    class="overtime-log-detail"
+                                    style="margin-top:4px">
+                                    Ghi chú: ${escapeHtml(item.note)}
+                                </div>
+                            `
+                            : ""
+                    }
+
+                </div>
+
+            `).join("")
+            : `
+                <div
+                    style="
+                        text-align:center;
+                        color:#888;
+                        padding:24px 10px;">
+                    Chưa có ngày nào được chấm tăng ca
+                    trong tháng ${String(currentMonth+1).padStart(2,"0")}/${currentYear}.
+                </div>
+            `;
+
+    openModal(`
+
+        <h2>
+            Tăng ca
+        </h2>
+
+        <div
+            style="
+                color:#777;
+                margin-top:-8px;
+                margin-bottom:10px;">
+            Tháng ${String(currentMonth+1).padStart(2,"0")}/${currentYear}
+        </div>
+
+        <div class="overtime-summary">
+
+            <div class="overtime-summary-row">
+                <span>Tổng số giờ tăng ca</span>
+                <strong>
+                    ${formatHours(totalHours)}
+                </strong>
+            </div>
+
+            <div class="overtime-summary-row">
+                <span>Tổng tiền tăng ca</span>
+                <strong>
+                    ${money(totalMoney)}
+                </strong>
+            </div>
+
+        </div>
+
+        <div class="overtime-log">
+            ${listHtml}
+        </div>
+
+    `);
+
+}
+
+
+function formatHours(hours){
+
+    const n = Number(hours) || 0;
+
+    return Number.isInteger(n)
+        ? `${n} giờ`
+        : `${String(n).replace(".", ",")} giờ`;
+
+}
+
+
+function formatDateVN(date){
+
+    const parts =
+        date.split("-");
+
+    if(parts.length !== 3){
+        return date;
+    }
+
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+
+}
+
 
 function openAppendix(type){
 
@@ -2283,18 +2810,145 @@ function deleteBoard(){
    MONTH
 ========================================= */
 
-function changeMonth(){
+function changeMonth(direction = 1){
 
-    currentMonth++;
+    currentMonth += direction;
 
-    if(currentMonth>11){
+    while(currentMonth < 0){
+        currentMonth += 12;
+        currentYear--;
+    }
 
-        currentMonth=0;
+    while(currentMonth > 11){
+        currentMonth -= 12;
         currentYear++;
-
     }
 
     renderCalendar();
+    updateSummary();
+
+}
+
+
+/* =========================================
+   MONTH PICKER
+========================================= */
+
+function openMonthPicker(){
+
+    openModal(`
+
+        <h2>
+            Chọn tháng / năm
+        </h2>
+
+        <div style="
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:12px;
+            margin-bottom:18px;
+        ">
+
+            <div>
+                <div class="note-title">
+                    Tháng
+                </div>
+
+                <select
+                    id="monthPicker"
+                    class="input">
+
+                    ${Array.from(
+                        {length:12},
+                        (_,i)=>`
+                            <option
+                                value="${i}"
+                                ${i === currentMonth ? "selected" : ""}>
+                                Tháng ${i+1}
+                            </option>
+                        `
+                    ).join("")}
+
+                </select>
+
+            </div>
+
+
+            <div>
+                <div class="note-title">
+                    Năm
+                </div>
+
+                <input
+                    id="yearPicker"
+                    class="input"
+                    type="number"
+                    min="2000"
+                    max="2100"
+                    value="${currentYear}">
+            </div>
+
+        </div>
+
+
+        <button
+            class="primary"
+            onclick="applyMonthPicker()">
+
+            Xem tháng này
+
+        </button>
+
+    `);
+
+}
+
+
+function applyMonthPicker(){
+
+    const selectedMonth =
+        Number(
+            document.getElementById(
+                "monthPicker"
+            ).value
+        );
+
+    const selectedYear =
+        Number(
+            document.getElementById(
+                "yearPicker"
+            ).value
+        );
+
+
+    if(
+        !Number.isInteger(selectedYear)
+        ||
+        selectedYear < 2000
+        ||
+        selectedYear > 2100
+    ){
+
+        alert(
+            "Vui lòng nhập năm từ 2000 đến 2100."
+        );
+
+        return;
+    }
+
+
+    currentMonth =
+        selectedMonth;
+
+    currentYear =
+        selectedYear;
+
+
+    closeModal();
+
+    renderCalendar();
+
+    updateSummary();
 
 }
 
@@ -2392,10 +3046,18 @@ function openDayDetail(key){
     const overtimeHours =
         Number(record.overtimeHours) || 0;
 
+    const dayOvertimeRate =
+        Math.max(
+            1,
+            Number(record.overtimeRate)
+                || overtimeRate
+                || 1.5
+        );
+
     const overtimeMoney =
         overtimeHours *
         hourlyRate *
-        overtimeRate;
+        dayOvertimeRate;
 
     const earned =
         workMoney + overtimeMoney;
@@ -2409,7 +3071,7 @@ function openDayDetail(key){
         <div class="appendix-item">
             Ngày
             <strong>
-                ${key}
+                ${formatDateVN(key)}
             </strong>
         </div>
 
@@ -2424,6 +3086,13 @@ function openDayDetail(key){
             Giờ tăng ca
             <strong>
                 ${overtimeHours} giờ
+            </strong>
+        </div>
+
+        <div class="appendix-item">
+            Hệ số tăng ca
+            <strong>
+                X${String(dayOvertimeRate).replace(".", ",")}
             </strong>
         </div>
 
