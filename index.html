@@ -302,6 +302,46 @@ button{
     justify-content:space-between;
 }
 
+.summary-row-button{
+    width:100%;
+    border:0;
+    font:inherit;
+    text-align:left;
+    cursor:pointer;
+    background:white;
+    color:inherit;
+}
+
+.summary-row-button:active{
+    background:#f7f8ff;
+}
+
+.summary-row-button::after{
+    content:"›";
+    color:#2670ff;
+    font-size:22px;
+    margin-left:10px;
+}
+
+.bottom-check-full{
+    width:100%;
+    min-height:74px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:4px;
+}
+
+.bottom-check-full strong{
+    font-size:20px;
+}
+
+.bottom-check-full span{
+    font-size:13px;
+    opacity:.95;
+}
+
 .summary-label{
     font-size:19px;
 }
@@ -488,6 +528,110 @@ button{
     bottom:7px;
 
     background:white;
+}
+
+/* ==============================
+   SALARY DETAIL
+================================ */
+
+.salary-detail-month{
+    color:#777;
+    margin-top:-10px;
+    margin-bottom:14px;
+}
+
+.salary-detail-summary{
+    background:#eeeaff;
+    border-radius:18px;
+    padding:15px;
+    margin-bottom:18px;
+}
+
+.salary-detail-summary > div{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:5px 0;
+}
+
+.salary-detail-summary strong{
+    color:#2670ff;
+}
+
+.salary-detail-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    max-height:52vh;
+    overflow:auto;
+}
+
+.salary-detail-item{
+    background:#f7f8fa;
+    border:1px solid #e8e8ee;
+    border-radius:17px;
+    padding:14px;
+}
+
+.salary-detail-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+}
+
+.salary-detail-sub{
+    color:#888;
+    font-size:14px;
+    margin-top:4px;
+}
+
+.salary-detail-total{
+    color:#2670ff;
+    white-space:nowrap;
+}
+
+.salary-detail-lines{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:10px;
+    color:#444;
+    font-size:14px;
+}
+
+.salary-detail-lines strong{
+    color:#211b52;
+}
+
+.salary-detail-lines.muted{
+    color:#999;
+}
+
+.salary-detail-note{
+    margin-top:10px;
+    padding-top:9px;
+    border-top:1px dashed #ddd;
+    color:#777;
+    font-size:13px;
+}
+
+.edit-day-btn{
+    width:100%;
+    margin-top:12px;
+    padding:11px;
+    border:0;
+    border-radius:12px;
+    background:#e9e9ff;
+    color:#6847ff;
+    font-weight:700;
+    font-size:15px;
+}
+
+.salary-detail-empty{
+    text-align:center;
+    color:#888;
+    padding:25px 10px;
 }
 
 /* ==============================
@@ -1198,7 +1342,10 @@ button{
             </div>
 
 
-            <div class="summary-row">
+            <button
+                type="button"
+                class="summary-row summary-row-button"
+                onclick="openSalaryDetail()">
 
                 <div class="summary-label">
                     Tổng lương
@@ -1210,7 +1357,7 @@ button{
                     0 đ
                 </div>
 
-            </div>
+            </button>
 
 
             <div class="summary-row">
@@ -1356,16 +1503,19 @@ button{
     id="bottomBar"
     class="bottom-bar hidden">
 
-    <div
-        id="bottomMessage"
-        class="bottom-message">
-        Bạn chưa chấm công
-    </div>
-
     <button
-        class="bottom-check"
+        type="button"
+        class="bottom-check bottom-check-full"
         onclick="openTodayAttendance()">
-        Chấm công　☝
+
+        <strong>
+            Chấm Công Hôm Nay
+        </strong>
+
+        <span>
+            (Chấm ngày khác tích chọn vào lịch trên)
+        </span>
+
     </button>
 
 </div>
@@ -2346,6 +2496,274 @@ function saveAttendance(key){
     renderCalendar();
 
     updateSummary();
+
+}
+
+
+
+/* =========================================
+   SALARY DETAIL
+========================================= */
+
+function openSalaryDetail(){
+
+    if(!currentBoard){
+        return;
+    }
+
+    const monthPrefix =
+        `${currentYear}-${String(currentMonth+1).padStart(2,"0")}-`;
+
+    const salary =
+        Number(currentBoard.salary) || 0;
+
+    const standardDays =
+        Number(currentBoard.standardDays) || 26;
+
+    const hoursPerDay =
+        Number(currentBoard.hoursPerDay) || 8;
+
+    const dailyRate =
+        salary / standardDays;
+
+    const hourlyRate =
+        dailyRate / hoursPerDay;
+
+    const records = [];
+
+    Object.entries(
+        currentBoard.attendance || {}
+    ).forEach(([date, record]) => {
+
+        if(!date.startsWith(monthPrefix)){
+            return;
+        }
+
+        const status =
+            Number(record.status) || 0;
+
+        const overtimeHours =
+            Number(record.overtimeHours) || 0;
+
+        if(status !== 0.5 && status !== 1 && overtimeHours <= 0){
+            return;
+        }
+
+        const workMoney =
+            status === 1
+                ? dailyRate
+                : status === 0.5
+                    ? dailyRate * 0.5
+                    : 0;
+
+        const rate =
+            Number(record.overtimeRate)
+                || Number(currentBoard.overtimeRate)
+                || 1.5;
+
+        const overtimeMoney =
+            overtimeHours *
+            hourlyRate *
+            rate;
+
+        records.push({
+            date,
+            status,
+            overtimeHours,
+            rate,
+            workMoney,
+            overtimeMoney,
+            total:workMoney + overtimeMoney,
+            note:record.note || ""
+        });
+
+    });
+
+    records.sort(
+        (a,b)=>a.date.localeCompare(b.date)
+    );
+
+    const total =
+        records.reduce(
+            (sum,item)=>sum + item.total,
+            0
+        );
+
+    const totalOT =
+        records.reduce(
+            (sum,item)=>sum + item.overtimeHours,
+            0
+        );
+
+    const list =
+        records.length
+            ? records.map(item=>`
+
+                <div class="salary-detail-item">
+
+                    <div class="salary-detail-top">
+
+                        <div>
+                            <strong>
+                                ${formatDateVN(item.date)}
+                            </strong>
+
+                            <div class="salary-detail-sub">
+                                ${
+                                    item.status === 1
+                                        ? "Cả ngày"
+                                        : item.status === 0.5
+                                            ? "1/2 công"
+                                            : "Chỉ tăng ca"
+                                }
+                            </div>
+                        </div>
+
+                        <strong class="salary-detail-total">
+                            ${money(item.total)}
+                        </strong>
+
+                    </div>
+
+
+                    <div class="salary-detail-lines">
+
+                        <span>
+                            Tiền công
+                        </span>
+
+                        <strong>
+                            ${money(item.workMoney)}
+                        </strong>
+
+                    </div>
+
+
+                    ${
+                        item.overtimeHours > 0
+                            ? `
+                                <div class="salary-detail-lines">
+
+                                    <span>
+                                        Tăng ca
+                                        ${formatHours(item.overtimeHours)}
+                                        · X${String(item.rate).replace(".", ",")}
+                                    </span>
+
+                                    <strong>
+                                        ${money(item.overtimeMoney)}
+                                    </strong>
+
+                                </div>
+                            `
+                            : `
+                                <div class="salary-detail-lines muted">
+                                    <span>
+                                        Không tăng ca
+                                    </span>
+                                    <span>—</span>
+                                </div>
+                            `
+                    }
+
+
+                    ${
+                        item.note
+                            ? `
+                                <div class="salary-detail-note">
+                                    Ghi chú: ${escapeHtml(item.note)}
+                                </div>
+                            `
+                            : ""
+                    }
+
+
+                    <button
+                        type="button"
+                        class="edit-day-btn"
+                        onclick="editSalaryDay('${item.date}')">
+
+                        Sửa ngày này
+
+                    </button>
+
+                </div>
+
+            `).join("")
+            : `
+                <div class="salary-detail-empty">
+                    Chưa có ngày nào được chấm công
+                    trong tháng này.
+                </div>
+            `;
+
+
+    openModal(`
+
+        <h2>
+            Chi tiết tổng lương
+        </h2>
+
+        <div class="salary-detail-month">
+            Tháng ${String(currentMonth+1).padStart(2,"0")}/${currentYear}
+        </div>
+
+
+        <div class="salary-detail-summary">
+
+            <div>
+                <span>Tổng tiền</span>
+                <strong>${money(total)}</strong>
+            </div>
+
+            <div>
+                <span>Tổng giờ tăng ca</span>
+                <strong>${formatHours(totalOT)}</strong>
+            </div>
+
+        </div>
+
+
+        <div class="note-title">
+            Chi tiết từng ngày
+        </div>
+
+        <div class="salary-detail-list">
+            ${list}
+        </div>
+
+    `);
+
+}
+
+
+function editSalaryDay(date){
+
+    const parts =
+        date.split("-");
+
+    if(parts.length !== 3){
+        return;
+    }
+
+    currentYear =
+        Number(parts[0]);
+
+    currentMonth =
+        Number(parts[1]) - 1;
+
+    renderCalendar();
+    updateSummary();
+
+    closeModal();
+
+    setTimeout(() => {
+
+        openDay(
+            Number(parts[2])
+        );
+
+    }, 0);
 
 }
 
