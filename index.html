@@ -1018,6 +1018,7 @@ button{
 }
 
 </style>
+    <meta name="attendance-app-version" content="2026-08-23-compact-v2">
 </head>
 
 <body>
@@ -1876,7 +1877,7 @@ function openDay(day){
                 <button
                     type="button"
                     class="overtime-option ${record.overtimeHours === h ? "selected" : ""}"
-                    onclick="selectOvertimeHours(${h})">
+                    onclick="selectOvertimeHours(${h}); return false;">
                     ${label}
                 </button>
             `;
@@ -1897,7 +1898,7 @@ function openDay(day){
                 <button
                     type="button"
                     class="coefficient-option ${record.overtimeRate === rate ? "selected" : ""}"
-                    onclick="selectOvertimeRate(${rate})">
+                    onclick="selectOvertimeRate(${rate}); return false;">
                     ${label}
                 </button>
             `;
@@ -1917,8 +1918,9 @@ function openDay(day){
         <div class="work-options">
 
             <button
+                type="button"
                 class="work-option ${record.status === 0.5 ? "selected" : ""}"
-                onclick="selectWorkType(0.5)">
+                onclick="selectWorkType(0.5); return false;">
 
                 <div class="work-icon">
                     ½
@@ -1931,8 +1933,9 @@ function openDay(day){
             </button>
 
             <button
+                type="button"
                 class="work-option ${record.status === 1 ? "selected" : ""}"
-                onclick="selectWorkType(1)">
+                onclick="selectWorkType(1); return false;">
 
                 <div class="work-icon">
                     ✓
@@ -2061,26 +2064,25 @@ function openDay(day){
 
 function selectWorkType(type){
 
-    document.getElementById(
-        "selectedWorkType"
-    ).value = type;
+    const input =
+        document.getElementById("selectedWorkType");
 
-    document
-        .querySelectorAll(".work-option")
-        .forEach(btn => {
-            btn.classList.remove("selected");
-        });
+    if(input){
+        input.value = String(type);
+    }
 
     const buttons =
-        document.querySelectorAll(
-            ".work-option"
-        );
+        document.querySelectorAll(".work-option");
 
-    if(type === 0.5){
+    buttons.forEach(btn => {
+        btn.classList.remove("selected");
+    });
+
+    if(type === 0.5 && buttons[0]){
         buttons[0].classList.add("selected");
     }
 
-    if(type === 1){
+    if(type === 1 && buttons[1]){
         buttons[1].classList.add("selected");
     }
 
