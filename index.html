@@ -1380,6 +1380,107 @@ button{
 .login-icon{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;flex:0 0 28px}.google-g{color:#4285f4;font-family:Arial,sans-serif}.facebook-f{color:#fff;font-family:Arial,sans-serif;font-size:24px}
 .login-note{margin:28px auto 0;max-width:340px;color:#8a8a8a;font-size:13px;line-height:1.5}.login-footer{margin-top:34px;color:#777;font-size:12px;line-height:1.5}.login-footer strong{color:#5841d8}.app.auth-hidden{display:none!important}
 @media(max-width:480px){.login-screen{padding:32px 22px 24px}.login-logo{width:88px;height:88px;border-radius:22px}.login-title{font-size:32px}.login-subtitle{font-size:16px;margin-bottom:30px}}
+
+/* =========================================================
+   MOBILE UI COMPACT - DG CHAM CONG
+   Tối ưu giao diện theo chiều rộng điện thoại, giảm cỡ chữ
+   nhưng vẫn giữ kích thước tiêu đề/lịch đủ dễ nhìn.
+========================================================= */
+html{
+    width:100%;
+    overflow-x:hidden;
+}
+
+body{
+    width:100%;
+    min-width:0;
+    overflow-x:hidden;
+    font-size:12px;
+}
+
+.app{
+    width:100%;
+    max-width:430px;
+    min-height:100dvh;
+    margin:0 auto;
+    padding-bottom:82px;
+    overflow-x:hidden;
+    font-size:12px;
+}
+
+/* Nội dung bên trong không được tạo chiều rộng kiểu desktop */
+.app *,
+.modal,
+.modal-content{
+    max-width:100%;
+}
+
+input,
+select,
+textarea,
+button{
+    font-size:12px;
+}
+
+input,
+select,
+textarea{
+    max-width:100%;
+}
+
+/* Cỡ chữ chuẩn */
+.app p,
+.app span,
+.app label,
+.app li,
+.app td,
+.app th,
+.app .input,
+.app .secondary,
+.app .primary{
+    font-size:12px;
+}
+
+/* Giữ tiêu đề phân cấp, không để mọi thứ thành chữ quá nhỏ */
+.app h1{font-size:20px;}
+.app h2{font-size:17px;}
+.app h3{font-size:14px;}
+
+.app .day{
+    font-size:16px;
+}
+
+/* Card và khu vực nội dung sát mép điện thoại hơn */
+@media(max-width:430px){
+    .app{
+        max-width:100%;
+    }
+
+    .container,
+    .section,
+    .card{
+        max-width:100%;
+    }
+}
+
+/* Trên màn hình lớn vẫn mô phỏng đúng một app điện thoại,
+   không kéo giao diện thành web rộng */
+@media(min-width:431px){
+    body{
+        display:flex;
+        justify-content:center;
+        align-items:flex-start;
+        background:#dfeeee;
+    }
+
+    .app{
+        width:430px;
+        min-height:100dvh;
+        background:#fff;
+        box-shadow:0 0 28px rgba(0,0,0,.08);
+    }
+}
+
 </style>
     <meta name="attendance-app-version" content="2026-08-23-google-redirect-v1">
     <link rel="icon" type="image/png" href="logo.webp">
