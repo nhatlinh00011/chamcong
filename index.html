@@ -1995,9 +1995,12 @@ html, body{
     updateProfile: async function(name){ if(!cloudUser) return false; await updateProfile(cloudUser,{displayName:name}); await pushCloud(window.__getBoards()); return true; }
   };
 
-  async function setupFirebaseAuth() {
-    try { await setPersistence(auth, browserLocalPersistence); } catch (e) { console.warn("Firebase persistence:", e); }
-  }
+  // Khởi tạo persistence ngay khi Firebase được tải.
+  // Không chờ (await) thao tác này trong lúc người dùng bấm nút Google:
+  // trên iPhone/Safari, await trước signInWithPopup có thể làm mất user gesture
+  // và khiến lần bấm đầu tiên bị trình duyệt chặn popup.
+  const authPersistenceReady = setPersistence(auth, browserLocalPersistence)
+    .catch(e => console.warn("Firebase persistence:", e));
 
   function showMainAppFromFirebase(user) {
     if (!user) return;
@@ -2030,7 +2033,9 @@ html, body{
     try {
       if (button) button.disabled = true;
       if (label) label.textContent = "Đang kết nối Google...";
-      await setupFirebaseAuth();
+
+      // Quan trọng: gọi popup trực tiếp từ sự kiện click, không await
+      // setPersistence trước đó để Safari/iOS không làm mất user gesture.
       const result = await signInWithPopup(auth, googleProvider);
       if (result?.user) {
         showMainAppFromFirebase(result.user);
@@ -2052,7 +2057,7 @@ html, body{
     }
   };
 
-  setupFirebaseAuth().then(() => {
+  authPersistenceReady.finally(() => {
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         showMainAppFromFirebase(user);
