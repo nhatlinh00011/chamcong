@@ -490,6 +490,47 @@ button{
     color:#2670ff;
 }
 
+/* Lương còn lại - ô riêng */
+.remaining-salary-box{
+    margin:14px 0 4px;
+    padding:16px 14px;
+    border:2px solid #ef5350;
+    border-radius:18px;
+    background:#fff8f8;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.remaining-salary-label{
+    color:#e53935;
+    font-size:17px;
+    font-weight:700;
+}
+
+.remaining-salary-value{
+    color:#e53935;
+    font-size:20px;
+    font-weight:800;
+    white-space:nowrap;
+}
+
+@media(max-width:480px){
+    .remaining-salary-box{
+        padding:14px 12px;
+        border-radius:16px;
+    }
+
+    .remaining-salary-label{
+        font-size:14px;
+    }
+
+    .remaining-salary-value{
+        font-size:17px;
+    }
+}
+
 @media(max-width:480px){
     .month-stats{
         padding:6px 14px;
@@ -3311,6 +3352,28 @@ function updateMonthStats(){
     let paidLeave = 0;
     let unpaidLeave = 0;
 
+    // Tính tiền công thực tế của riêng tháng đang xem.
+    const salary =
+        Number(currentBoard.salary) || 0;
+
+    const standardDays =
+        Number(currentBoard.standardDays) || 26;
+
+    const hoursPerDay =
+        Number(currentBoard.hoursPerDay) || 8;
+
+    const defaultOvertimeRate =
+        Number(currentBoard.overtimeRate) || 1.5;
+
+    const dailyRate =
+        salary / standardDays;
+
+    const hourlyRate =
+        dailyRate / hoursPerDay;
+
+    let earnedWork = 0;
+    let earnedOvertime = 0;
+
     Object.entries(attendance).forEach(([date, record]) => {
 
         if(!date.startsWith(monthPrefix)){
@@ -3322,8 +3385,10 @@ function updateMonthStats(){
 
         if(status === 1 || Number(status) === 1){
             totalWorkDays += 1;
+            earnedWork += dailyRate;
         }else if(status === 0.5 || Number(status) === 0.5){
             totalWorkDays += 0.5;
+            earnedWork += dailyRate * 0.5;
         }else if(
             status === 3
             || status === "3"
@@ -3342,11 +3407,26 @@ function updateMonthStats(){
             unpaidLeave += 1;
         }
 
-        totalOvertimeHours +=
+        const ot =
             Math.max(
                 0,
                 Number(record?.overtimeHours) || 0
             );
+
+        const otRate =
+            Math.max(
+                1,
+                Number(record?.overtimeRate)
+                    || defaultOvertimeRate
+                    || 1.5
+            );
+
+        totalOvertimeHours += ot;
+
+        earnedOvertime +=
+            hourlyRate *
+            ot *
+            otRate;
     });
 
     /*
@@ -3436,6 +3516,29 @@ function updateMonthStats(){
 
     });
 
+    /*
+     * Lương còn lại =
+     * tiền công đã chấm
+     * + tiền tăng ca theo lịch
+     * + phụ cấp
+     * + tăng ca nhập thủ công
+     * - tổng ứng
+     * - tổng trừ tiền
+     */
+    const manualOvertime =
+        Number(currentBoard.overtime) || 0;
+
+    const earnedThisMonth =
+        earnedWork +
+        earnedOvertime +
+        allowance +
+        manualOvertime;
+
+    const remainingSalary =
+        earnedThisMonth -
+        advance -
+        deduct;
+
     box.innerHTML = `
 
         <div class="month-stat-row">
@@ -3524,6 +3627,16 @@ function updateMonthStats(){
                 </strong>
             </div>
 
+        </div>
+
+        <div class="remaining-salary-box">
+            <span class="remaining-salary-label">
+                Lương còn lại:
+            </span>
+
+            <strong class="remaining-salary-value">
+                ${money(remainingSalary)}
+            </strong>
         </div>
 
     `;
