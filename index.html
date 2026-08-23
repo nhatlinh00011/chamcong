@@ -1360,6 +1360,16 @@ button{
     font-weight:600;
 }
 
+
+/* LOGIN */
+.login-screen{min-height:100vh;min-height:100dvh;box-sizing:border-box;padding:40px 24px 28px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#eef8f8 0%,#f7fbfb 100%)}
+.login-card{width:100%;max-width:430px;text-align:center}.login-logo{width:96px;height:96px;object-fit:cover;border-radius:24px;display:block;margin:0 auto 24px;box-shadow:0 12px 30px rgba(55,100,180,.18)}
+.login-title{margin:0;color:#22205b;font-size:36px;line-height:1.12;font-weight:800;letter-spacing:-.6px}.login-subtitle{margin:12px 0 34px;color:#777;font-size:17px;line-height:1.5}
+.login-buttons{display:flex;flex-direction:column;gap:14px}.login-btn{width:100%;min-height:58px;border:0;border-radius:18px;padding:0 20px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:17px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s ease,opacity .12s ease}.login-btn:active{transform:scale(.98)}
+.login-google{background:#fff;color:#222;box-shadow:0 4px 16px rgba(0,0,0,.08)}.login-facebook{background:#1877f2;color:#fff;box-shadow:0 8px 20px rgba(24,119,242,.22)}.login-guest{background:#6848ff;color:#fff;box-shadow:0 10px 24px rgba(104,72,255,.25)}
+.login-icon{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;flex:0 0 28px}.google-g{color:#4285f4;font-family:Arial,sans-serif}.facebook-f{color:#fff;font-family:Arial,sans-serif;font-size:24px}
+.login-note{margin:28px auto 0;max-width:340px;color:#8a8a8a;font-size:13px;line-height:1.5}.login-footer{margin-top:34px;color:#777;font-size:12px;line-height:1.5}.login-footer strong{color:#5841d8}.app.auth-hidden{display:none!important}
+@media(max-width:480px){.login-screen{padding:32px 22px 24px}.login-logo{width:88px;height:88px;border-radius:22px}.login-title{font-size:32px}.login-subtitle{font-size:16px;margin-bottom:30px}}
 </style>
     <meta name="attendance-app-version" content="2026-08-23-compact-v2">
     <link rel="icon" type="image/png" href="logo.webp">
@@ -1369,8 +1379,23 @@ button{
 </head>
 
 <body>
+<div id="loginScreen" class="login-screen">
+ <div class="login-card">
+  <img class="login-logo" src="logo.webp" alt="DG Media">
+  <h1 class="login-title">Chấm công</h1>
+  <p class="login-subtitle">Đăng nhập để đồng bộ và bảo vệ dữ liệu chấm công của bạn</p>
+  <div class="login-buttons">
+   <button type="button" class="login-btn login-google" onclick="loginWithGoogle()"><span class="login-icon google-g">G</span><span>Đăng nhập Google</span></button>
+   <button type="button" class="login-btn login-facebook" onclick="loginWithFacebook()"><span class="login-icon facebook-f">f</span><span>Đăng nhập Facebook</span></button>
+   <button type="button" class="login-btn login-guest" onclick="loginAsGuest()"><span class="login-icon">👤</span><span>Đăng nhập khách</span></button>
+  </div>
+  <div class="login-note">Google và Facebook sẽ được kết nối Firebase ở bước thiết lập. Chế độ khách có thể sử dụng ngay trên thiết bị này.</div>
+  <div class="login-footer">Sản phẩm thuộc hệ sinh thái <strong>DG Media Official</strong></div>
+ </div>
+</div>
 
-<div class="app">
+
+<div class="app auth-hidden">
 
     <!-- =====================
          LIST
@@ -4760,6 +4785,13 @@ function escapeAttr(text){
 
 }
 
+
+
+function showMainApp(){const login=document.getElementById("loginScreen");const app=document.querySelector(".app");if(login)login.style.display="none";if(app)app.classList.remove("auth-hidden")}
+function loginAsGuest(){try{localStorage.setItem("dgAuthSession",JSON.stringify({type:"guest",loggedIn:true,at:Date.now()}))}catch(e){}showMainApp()}
+function loginWithGoogle(){alert("Đăng nhập Google chưa được kết nối Firebase. Giao diện đã sẵn sàng; bước tiếp theo sẽ kết nối tài khoản Google và đồng bộ dữ liệu lên đám mây.")}
+function loginWithFacebook(){alert("Đăng nhập Facebook chưa được kết nối Firebase. Giao diện đã sẵn sàng; bước tiếp theo sẽ kết nối tài khoản Facebook và đồng bộ dữ liệu lên đám mây.")}
+(function(){try{const s=JSON.parse(localStorage.getItem("dgAuthSession")||"null");if(s&&s.loggedIn)showMainApp()}catch(e){}})();
 
 /* =========================================
    PWA / OFFLINE
