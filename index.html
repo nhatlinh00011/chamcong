@@ -877,6 +877,11 @@ button{
     color:#6847ff;
 }
 
+.work-option-full{
+    grid-column:1 / -1;
+    min-height:92px;
+}
+
 .work-icon{
     width:50px;
     height:50px;
@@ -2084,7 +2089,9 @@ function openDay(day){
                 ? 0.5
                 : oldRecord.status === 1
                     ? 1
-                    : 0,
+                    : oldRecord.status === 2
+                        ? 2
+                        : 0,
 
         overtimeHours:
             Number(oldRecord.overtimeHours) || 0,
@@ -2180,6 +2187,22 @@ function openDay(day){
 
                 <strong>
                     Cả ngày
+                </strong>
+
+            </button>
+
+            <button
+                type="button"
+                class="work-option work-option-full"
+                style="${record.status === 2 ? "border-color:#6847ff;background:#eeeaff;color:#6847ff;" : ""}"
+                onclick="selectWorkType(2); return false;">
+
+                <div class="work-icon">
+                    ⏱
+                </div>
+
+                <strong>
+                    Tăng ca cuối tuần/ngày
                 </strong>
 
             </button>
@@ -2318,6 +2341,9 @@ function selectWorkType(type){
 
     buttons.forEach(btn => {
         btn.classList.remove("selected");
+        btn.style.borderColor = "";
+        btn.style.background = "";
+        btn.style.color = "";
     });
 
     if(type === 0.5 && buttons[0]){
@@ -2326,6 +2352,10 @@ function selectWorkType(type){
 
     if(type === 1 && buttons[1]){
         buttons[1].classList.add("selected");
+    }
+
+    if(type === 2 && buttons[2]){
+        buttons[2].classList.add("selected");
     }
 
 }
@@ -2560,10 +2590,10 @@ function saveAttendance(key){
             "attendanceNote"
         ).value.trim();
 
-    if(type !== 0.5 && type !== 1){
+    if(type !== 0.5 && type !== 1 && type !== 2){
 
         alert(
-            "Vui lòng chọn 1/2 công hoặc cả ngày."
+            "Vui lòng chọn 1/2 công, cả ngày hoặc tăng ca cuối tuần/ngày."
         );
 
         return;
@@ -2701,7 +2731,9 @@ function openSalaryDetail(){
                                         ? "Cả ngày"
                                         : item.status === 0.5
                                             ? "1/2 công"
-                                            : "Chỉ tăng ca"
+                                            : item.status === 2
+                                                ? "Tăng ca cuối tuần/ngày"
+                                                : "Chỉ tăng ca"
                                 }
                             </div>
                         </div>
