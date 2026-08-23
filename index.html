@@ -1905,6 +1905,16 @@ html, body{
 
   function cloudRef(uid){ return doc(db, "users", uid, "appData", "main"); }
 
+  // Xóa bảng "Sofa" được tạo tự động bởi phiên bản cũ.
+  function removeLegacyDefaultBoard(list){
+    if(!Array.isArray(list)) return [];
+    return list.filter(board => !(
+      String(board?.name || '').trim().toLowerCase() === 'sofa' &&
+      Number(board?.salary || 0) === 8500000 &&
+      Object.keys(board?.attendance || {}).length === 0
+    ));
+  }
+
   function setSyncStatus(text, ok=false){
     const el = document.getElementById("syncStatus");
     if(el){ el.textContent = text; el.style.background = ok ? "#effaf1" : "#f1f8ff"; el.style.color = ok ? "#2e8b3c" : "#2670ff"; }
@@ -1932,10 +1942,14 @@ html, body{
       if(snap.exists()){
         const data = snap.data() || {};
         const cloudUpdated = Number(data.updatedAt || 0);
-        if(Array.isArray(data.boards) && data.boards.length && cloudUpdated >= localUpdated){
-          window.__applyCloudBoards(data.boards);
+        const cloudBoards = removeLegacyDefaultBoard(data.boards);
+        if(Array.isArray(data.boards) && cloudUpdated >= localUpdated){
+          window.__applyCloudBoards(cloudBoards, cloudUpdated);
+          if(cloudBoards.length !== data.boards.length || data.boards.length === 0){
+            await pushCloud(cloudBoards);
+          }
         }else if(localUpdated > cloudUpdated){
-          await pushCloud(window.__getBoards());
+          await pushCloud(removeLegacyDefaultBoard(window.__getBoards()));
         }
       }else{
         await pushCloud(window.__getBoards());
@@ -1953,7 +1967,9 @@ html, body{
       if(Array.isArray(data.boards) && data.boards.length){
         const cloudUpdated = Number(data.updatedAt || 0);
         const localUpdated = Number(localStorage.getItem("dgLocalUpdatedAt") || 0);
-        if(cloudUpdated >= localUpdated) window.__applyCloudBoards(data.boards, cloudUpdated);
+        const cleanBoards = removeLegacyDefaultBoard(data.boards);
+        if(cloudUpdated >= localUpdated) window.__applyCloudBoards(cleanBoards, cloudUpdated);
+        if(cleanBoards.length !== data.boards.length) pushCloud(cleanBoards);
       }
       setSyncStatus("☁️ Đã đồng bộ", true);
     }, err => { console.error("Firestore listener:", err); setSyncStatus("⚠️ Mất kết nối đồng bộ", false); });
@@ -2087,25 +2103,18 @@ window.__applyCloudBoards = function(cloudBoards, cloudUpdated=Date.now()){
    INIT
 ========================================= */
 
-if(boards.length === 0){
+// Không tự tạo bảng chấm công mặc định.
+// Xóa bảng "Sofa" mặc định cũ nếu nó vẫn còn trong dữ liệu cục bộ.
+boards = boards.filter(board => !(
+    String(board?.name || '').trim().toLowerCase() === 'sofa' &&
+    Number(board?.salary || 0) === 8500000 &&
+    Object.keys(board?.attendance || {}).length === 0
+));
 
-    boards.push({
-        id:Date.now(),
-        name:"Sofa",
-        salary:8500000,
-        standardDays:26,
-        hoursPerDay:8,
-        overtimeRate:1.5,
-        advance:0,
-        deduct:0,
-        allowance:0,
-        overtime:0,
-        paid:0,
-        attendance:{}
-    });
-
-    saveData();
-}
+try {
+    localStorage.setItem("attendanceBoards", JSON.stringify(boards));
+    localStorage.setItem("dgLocalUpdatedAt", String(Date.now()));
+} catch(e) {}
 
 // Bổ sung thiết lập mặc định cho các bảng đã tạo từ phiên bản cũ.
 boards.forEach(board => {
