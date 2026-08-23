@@ -419,6 +419,16 @@ button{
     background:#8bc653;
 }
 
+.day.half{
+    background:linear-gradient(
+        135deg,
+        #8bc653 0%,
+        #8bc653 50%,
+        #c9c5c6 50%,
+        #c9c5c6 100%
+    );
+}
+
 .day.off{
     background:#c9c5c6;
 }
@@ -442,6 +452,76 @@ button{
 
     bottom:7px;
 
+    background:white;
+}
+
+/* ==============================
+   NEW ATTENDANCE OPTIONS
+================================ */
+
+.work-options{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:24px;
+}
+
+.work-option{
+    border:2px solid #eeeeee;
+    background:#f7f8fa;
+    border-radius:20px;
+    padding:20px 10px;
+    color:#211b52;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    font-size:17px;
+    transition:.2s;
+}
+
+.work-option.selected{
+    border-color:#6847ff;
+    background:#eeeaff;
+    color:#6847ff;
+}
+
+.work-icon{
+    width:50px;
+    height:50px;
+    border-radius:16px;
+    background:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:25px;
+    font-weight:bold;
+    box-shadow:0 4px 12px rgba(0,0,0,.07);
+}
+
+.note-title{
+    font-size:18px;
+    font-weight:600;
+    margin-bottom:10px;
+}
+
+.note-input{
+    width:100%;
+    resize:none;
+    border:1px solid #e0e0e0;
+    background:#f7f8fa;
+    border-radius:16px;
+    padding:15px;
+    font-family:inherit;
+    font-size:16px;
+    color:#211b52;
+    outline:none;
+    margin-bottom:18px;
+}
+
+.note-input:focus{
+    border-color:#6847ff;
     background:white;
 }
 
@@ -1373,7 +1453,11 @@ function renderCalendar(){
 
         if(record){
 
-            div.classList.add("work");
+            if(record.status === 0.5){
+                div.classList.add("half");
+            }else{
+                div.classList.add("work");
+            }
 
         }else{
 
@@ -1469,79 +1553,83 @@ function openDay(day){
             day
         );
 
-    const record =
-        currentBoard.attendance[key]
-        ||
-        {
-            in:"",
-            out:""
-        };
+    const oldRecord =
+        currentBoard.attendance[key] || {};
 
+    // Hỗ trợ dữ liệu cũ nếu bảng đã từng dùng Giờ vào/Giờ ra.
+    const record = {
+        status:
+            oldRecord.status === 0.5
+                ? 0.5
+                : oldRecord.status === 1
+                    ? 1
+                    : 0,
+        note:
+            oldRecord.note || ""
+    };
 
     openModal(`
 
         <div class="day-date">
-            ${day}/${currentMonth+1}/${currentYear}
+            ${String(day).padStart(2,"0")}/${String(currentMonth+1).padStart(2,"0")}/${currentYear}
         </div>
 
         <h2>
             Chấm công
         </h2>
 
-        <div class="time-row">
-
-            <div class="time-card">
-
-                <span>
-                    Giờ vào
-                </span>
-
-                <strong>
-                    ${record.in || "--:--"}
-                </strong>
-
-            </div>
-
-            <div class="time-card">
-
-                <span>
-                    Giờ ra
-                </span>
-
-                <strong>
-                    ${record.out || "--:--"}
-                </strong>
-
-            </div>
-
-        </div>
-
-
-        <div class="action-row">
+        <div class="work-options">
 
             <button
-                class="primary"
-                onclick="setCheckIn('${key}')">
-                Chấm vào
+                class="work-option ${record.status === 0.5 ? "selected" : ""}"
+                onclick="selectWorkType(0.5)">
+
+                <div class="work-icon">
+                    ½
+                </div>
+
+                <strong>
+                    1/2 công
+                </strong>
+
             </button>
 
             <button
-                class="secondary"
-                onclick="setCheckOut('${key}')">
-                Chấm ra
+                class="work-option ${record.status === 1 ? "selected" : ""}"
+                onclick="selectWorkType(1)">
+
+                <div class="work-icon">
+                    ✓
+                </div>
+
+                <strong>
+                    Cả ngày
+                </strong>
+
             </button>
 
         </div>
 
+        <div class="note-title">
+            Ghi chú
+        </div>
 
-        <br>
+        <textarea
+            id="attendanceNote"
+            class="note-input"
+            placeholder="Nhập ghi chú..."
+            rows="4">${escapeHtml(record.note)}</textarea>
+
+        <input
+            type="hidden"
+            id="selectedWorkType"
+            value="${record.status || ""}">
 
         <button
-            class="secondary"
-            style="width:100%"
-            onclick="openDayDetail('${key}')">
+            class="primary"
+            onclick="saveAttendance('${key}')">
 
-            Xem chi tiết ngày
+            Lưu chấm công
 
         </button>
 
@@ -1550,80 +1638,61 @@ function openDay(day){
 }
 
 
-/* =========================================
-   CHECK IN
-========================================= */
+function selectWorkType(type){
 
-function setCheckIn(key){
+    document.getElementById(
+        "selectedWorkType"
+    ).value = type;
 
-    const now =
-        new Date();
+    document
+        .querySelectorAll(".work-option")
+        .forEach(btn => {
+            btn.classList.remove("selected");
+        });
 
-    const time =
-        now.toLocaleTimeString(
-            "vi-VN",
-            {
-                hour:"2-digit",
-                minute:"2-digit"
-            }
+    const buttons =
+        document.querySelectorAll(
+            ".work-option"
         );
 
-    if(
-        !currentBoard.attendance[key]
-    ){
-
-        currentBoard.attendance[key]={
-            in:"",
-            out:""
-        };
-
+    if(type === 0.5){
+        buttons[0].classList.add("selected");
     }
 
-    currentBoard.attendance[key].in =
-        time;
-
-    saveData();
-
-    closeModal();
-
-    renderCalendar();
-
-    updateSummary();
+    if(type === 1){
+        buttons[1].classList.add("selected");
+    }
 
 }
 
 
-/* =========================================
-   CHECK OUT
-========================================= */
+function saveAttendance(key){
 
-function setCheckOut(key){
-
-    const now =
-        new Date();
-
-    const time =
-        now.toLocaleTimeString(
-            "vi-VN",
-            {
-                hour:"2-digit",
-                minute:"2-digit"
-            }
+    const type =
+        Number(
+            document.getElementById(
+                "selectedWorkType"
+            ).value
         );
 
-    if(
-        !currentBoard.attendance[key]
-    ){
+    const note =
+        document.getElementById(
+            "attendanceNote"
+        ).value.trim();
 
-        currentBoard.attendance[key]={
-            in:"",
-            out:""
-        };
+    if(type !== 0.5 && type !== 1){
 
+        alert(
+            "Vui lòng chọn 1/2 công hoặc cả ngày."
+        );
+
+        return;
     }
 
-    currentBoard.attendance[key].out =
-        time;
+    currentBoard.attendance[key] = {
+        status:type,
+        note:note
+    };
 
     saveData();
 
@@ -2064,6 +2133,13 @@ function openDayDetail(key){
 
     }
 
+    const statusText =
+        record.status === 0.5
+            ? "1/2 công"
+            : record.status === 1
+                ? "Cả ngày"
+                : "Chưa xác định";
+
     openModal(`
 
         <h2>
@@ -2078,17 +2154,23 @@ function openDayDetail(key){
         </div>
 
         <div class="appendix-item">
-            Giờ vào
+            Công
             <strong>
-                ${record.in || "--:--"}
+                ${statusText}
             </strong>
         </div>
 
-        <div class="appendix-item">
-            Giờ ra
-            <strong>
-                ${record.out || "--:--"}
-            </strong>
+        <div class="appendix-item"
+             style="display:block">
+
+            <div style="margin-bottom:8px">
+                Ghi chú
+            </div>
+
+            <div style="color:#777;line-height:1.5">
+                ${escapeHtml(record.note || "Không có ghi chú")}
+            </div>
+
         </div>
 
     `);
@@ -2103,15 +2185,26 @@ function openDayDetail(key){
 function exportExcel(){
 
     let csv =
-        "Ngày,Giờ vào,Giờ ra\n";
+        "Ngày,Công,Ghi chú\n";
 
     Object.entries(
         currentBoard.attendance
     ).forEach(
         ([date,record])=>{
 
+            const work =
+                record.status === 0.5
+                    ? "1/2 công"
+                    : record.status === 1
+                        ? "Cả ngày"
+                        : "";
+
+            const note =
+                String(record.note || "")
+                    .replaceAll('"','""');
+
             csv +=
-                `${date},${record.in || ""},${record.out || ""}\n`;
+                `${date},${work},"${note}"\n`;
 
         }
     );
