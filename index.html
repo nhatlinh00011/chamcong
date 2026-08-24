@@ -1449,7 +1449,7 @@ html, body{
 .nav-btn .nav-icon{font-size:23px;line-height:1}.nav-btn.active{color:#6847ff}.nav-btn:active{transform:scale(.96)}
 .bottom-bar{bottom:68px}
 .screen-pad{padding:20px 20px 90px}.screen-title{font-size:29px;font-weight:800;color:#211b52;margin:8px 2px 18px}
-.export-screen{min-height:100vh;padding-bottom:32px}.export-topbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}.export-back{width:44px;height:44px;border-radius:14px;background:#fff;color:#211b52;font-size:34px;line-height:1;box-shadow:0 5px 14px rgba(40,40,80,.08)}.export-title{margin:0;font-size:28px}.export-subtitle{font-size:13px;color:#777;margin-top:-12px}.export-card{margin-bottom:14px}.export-month-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.export-month{padding:11px 4px;border-radius:13px;background:#f1f1f5;color:#211b52;font-size:13px;font-weight:700;border:1px solid transparent}.export-month.selected{background:#6847ff;color:#fff;box-shadow:0 5px 12px rgba(104,71,255,.2)}.export-month small{display:block;font-size:10px;font-weight:500;opacity:.75;margin-top:2px}.export-check-row{display:flex;align-items:flex-start;gap:11px;padding:13px 0;border-bottom:1px solid #eee;cursor:pointer}.export-check-row:last-child{border-bottom:0}.export-check-row input{width:20px;height:20px;accent-color:#6847ff;margin-top:1px;flex:0 0 20px}.export-check-row span{display:flex;flex-direction:column;gap:3px;font-size:15px;color:#211b52}.export-check-row small{font-size:11px;color:#888;line-height:1.35}.export-download-btn{margin-top:2px}.export-note{text-align:center;color:#888;font-size:11px;line-height:1.45;padding:10px 20px 0}
+.export-screen{min-height:100vh;padding-bottom:32px}.export-topbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}.export-back{width:44px;height:44px;border-radius:14px;background:#fff;color:#211b52;font-size:34px;line-height:1;box-shadow:0 5px 14px rgba(40,40,80,.08)}.export-title{margin:0;font-size:28px}.export-subtitle{font-size:13px;color:#777;margin-top:-12px}.export-card{margin-bottom:14px}.export-month-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.export-month{padding:11px 4px;border-radius:13px;background:#f1f1f5;color:#211b52;font-size:13px;font-weight:700;border:1px solid transparent}.export-month small{display:block;font-size:10px;font-weight:600;margin-top:2px;color:#8b8b93}.export-month.current-year{background:#fff1f1;color:#211b52;border-color:#f6caca}.export-month.current-year small{color:#2670d9}.export-month.previous-year{background:#f1f1f5;color:#211b52}.export-month.previous-year small{color:#8b8b93}.export-month.current-year.selected{background:#ffdede;color:#b83b3b;border-color:#f29a9a;box-shadow:0 5px 12px rgba(239,107,107,.18)}.export-month.previous-year.selected{background:#6847ff;color:#fff;box-shadow:0 5px 12px rgba(104,71,255,.2)}.export-month.previous-year.selected small{color:#fff;opacity:.8}.export-check-row{display:flex;align-items:flex-start;gap:11px;padding:13px 0;border-bottom:1px solid #eee;cursor:pointer}.export-check-row:last-child{border-bottom:0}.export-check-row input{width:20px;height:20px;accent-color:#6847ff;margin-top:1px;flex:0 0 20px}.export-check-row span{display:flex;flex-direction:column;gap:3px;font-size:15px;color:#211b52}.export-check-row small{font-size:11px;color:#888;line-height:1.35}.export-download-btn{margin-top:2px}.export-note{text-align:center;color:#888;font-size:11px;line-height:1.45;padding:10px 20px 0}
 
 /* Transaction sub-screens */
 .transaction-screen{min-height:100vh;min-height:100dvh;padding:18px 20px 92px;box-sizing:border-box}
@@ -2439,57 +2439,52 @@ function renderBoards(){
 
 function createBoard(){
 
-    const name =
-        prompt(
-            "Nhập tên bảng chấm công:"
-        );
+    openModal(`
+        <h2>Tạo bảng chấm công</h2>
+        <div class="transaction-modal-note">Nhập thông tin ban đầu. Số tiền sẽ tự động định dạng theo kiểu Việt Nam.</div>
+        <input id="createBoardName" class="input" type="text" autocomplete="off" placeholder="Tên bảng chấm công">
+        <input id="createBoardSalary" class="input money-input" type="text" inputmode="numeric" autocomplete="off" placeholder="Lương cơ bản/tháng">
+        <button class="primary" type="button" onclick="saveNewBoard()">Tạo mới</button>
+    `);
 
-    if(!name || !name.trim()){
+}
+
+function saveNewBoard(){
+
+    const name = document.getElementById("createBoardName")?.value.trim() || "";
+    const salary = parseMoney(document.getElementById("createBoardSalary")?.value);
+
+    if(!name){
+        alert("Vui lòng nhập tên bảng chấm công.");
         return;
     }
 
-    const salary =
-        prompt(
-            "Nhập lương cơ bản:",
-            "8500000"
-        );
+    if(salary <= 0){
+        alert("Vui lòng nhập lương cơ bản lớn hơn 0.");
+        return;
+    }
 
     const board = {
-
         id:Date.now(),
-
-        name:name.trim(),
-
-        salary:
-            Number(salary) || 0,
-
-        // 26 ngày công chuẩn/tháng, 8 giờ/ngày, tăng ca hệ số 1.5
+        name,
+        salary,
         standardDays:26,
         hoursPerDay:8,
         overtimeRate:1.5,
         annualLeave:0,
         events:[],
-
         advance:0,
-
         deduct:0,
-
         allowance:0,
-
         overtime:0,
-
         paid:0,
-
         transactions:[],
-
         attendance:{}
-
     };
 
     boards.push(board);
-
     saveData();
-
+    closeModal();
     renderBoards();
 
 }
@@ -4252,6 +4247,57 @@ function money(value){
 
 }
 
+// Chuẩn hoá số tiền khi người dùng nhập: 2000000 → 2.000.000
+function parseMoney(value){
+    const raw = String(value ?? "").replace(/[^0-9]/g, "");
+    return raw ? Number(raw) : 0;
+}
+
+function formatMoneyInputValue(value){
+    const n = parseMoney(value);
+    return n > 0 ? n.toLocaleString("vi-VN") : "";
+}
+
+function formatMoneyInput(el){
+    if(!el) return;
+
+    const oldValue = String(el.value ?? "");
+    const oldPos = typeof el.selectionStart === "number" ? el.selectionStart : oldValue.length;
+    const digitsBeforeCursor = oldValue.slice(0, oldPos).replace(/[^0-9]/g, "").length;
+    const digits = oldValue.replace(/[^0-9]/g, "");
+
+    if(!digits){
+        el.value = "";
+        return;
+    }
+
+    const formatted = Number(digits).toLocaleString("vi-VN");
+    el.value = formatted;
+
+    let pos = 0;
+    let seenDigits = 0;
+    while(pos < formatted.length && seenDigits < digitsBeforeCursor){
+        if(/[0-9]/.test(formatted[pos])) seenDigits++;
+        pos++;
+    }
+    try{ el.setSelectionRange(pos, pos); }catch(e){}
+}
+
+// Áp dụng cho mọi ô nhập có class money-input, kể cả các form mở động bằng modal.
+document.addEventListener("input", (event) => {
+    const el = event.target;
+    if(el && el.classList && el.classList.contains("money-input")){
+        formatMoneyInput(el);
+    }
+});
+
+document.addEventListener("blur", (event) => {
+    const el = event.target;
+    if(el && el.classList && el.classList.contains("money-input")){
+        formatMoneyInput(el);
+    }
+}, true);
+
 
 /* =========================================
    APPENDIX
@@ -4986,14 +5032,14 @@ function openTransactionForm(editId=null){
     openModal(`
         <h2>${title}</h2>
         <div class="transaction-modal-note">Khoản này sẽ được cộng/trừ tự động vào bảng lương.</div>
-        <input id="moneyInput" class="input" type="number" min="0" inputmode="numeric" value="${amount}" placeholder="Nhập số tiền">
+        <input id="moneyInput" class="input money-input" type="text" inputmode="numeric" autocomplete="off" value="${formatMoneyInputValue(amount)}" placeholder="Nhập số tiền">
         <input id="noteInput" class="input" value="${escapeAttr(note)}" placeholder="Ghi chú">
         <button class="primary" type="button" onclick="saveTransactionForm(${existing?Number(existing.id):"null"})">Lưu</button>
     `);
 }
 
 function saveTransactionForm(editId=null){
-    const amount=Number(document.getElementById("moneyInput")?.value)||0;
+    const amount=parseMoney(document.getElementById("moneyInput")?.value);
     const note=document.getElementById("noteInput")?.value.trim()||"";
     if(amount<=0){alert("Vui lòng nhập số tiền lớn hơn 0.");return;}
     if(!Array.isArray(currentBoard.transactions)) currentBoard.transactions=[];
@@ -5041,8 +5087,10 @@ function openAppendix(type){
 
         <input
             id="moneyInput"
-            class="input"
-            type="number"
+            class="input money-input"
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
             placeholder="Nhập số tiền">
 
         <input
@@ -5065,12 +5113,9 @@ function openAppendix(type){
 
 function saveAppendix(type){
 
-    const amount =
-        Number(
-            document.getElementById(
-                "moneyInput"
-            ).value
-        ) || 0;
+    const amount = parseMoney(
+        document.getElementById("moneyInput")?.value
+    );
 
     const note =
         document.getElementById(
@@ -5211,9 +5256,11 @@ function openSettings(){
 
         <input
             id="newSalary"
-            class="input"
-            type="number"
-            value="${currentBoard.salary}"
+            class="input money-input"
+            type="text"
+            inputmode="numeric"
+            autocomplete="off"
+            value="${formatMoneyInputValue(currentBoard.salary)}"
             placeholder="Lương cơ bản/tháng">
 
         <input
@@ -5274,11 +5321,11 @@ function saveSettings(){
         ).value.trim();
 
     currentBoard.salary =
-        Number(
+        parseMoney(
             document.getElementById(
                 "newSalary"
             ).value
-        ) || 0;
+        );
 
     currentBoard.standardDays =
         Math.max(
@@ -5688,6 +5735,9 @@ function openDayDetail(key){
 ========================================= */
 
 function exportExcel(){
+    // Mỗi lần mở màn hình Xuất Excel, mặc định chọn đúng tháng hiện tại theo lịch.
+    const now=new Date();
+    exportSelectedMonth=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
     navigateApp("export");
     renderExportMonths();
 }
@@ -5697,15 +5747,73 @@ let exportSelectedMonth = "";
 function renderExportMonths(){
     const box=document.getElementById("exportMonths");
     if(!box) return;
+
+    // Luôn lấy thời gian thực tế của thiết bị.
+    // Năm trước: hiển thị đủ 12 tháng.
+    // Năm hiện tại: chỉ hiển thị đến đúng tháng hiện tại,
+    // không hiển thị các tháng chưa tới.
     const now=new Date();
     const currentY=now.getFullYear();
+    const currentM=now.getMonth()+1;
     const previousY=currentY-1;
-    if(!exportSelectedMonth) exportSelectedMonth=`${currentY}-${String(now.getMonth()+1).padStart(2,"0")}`;
+    const currentKey=`${currentY}-${String(currentM).padStart(2,"0")}`;
+
+    // Chỉ đặt mặc định khi chưa có tháng được chọn.
+    // Hàm exportExcel() sẽ đặt lại về tháng thực tế khi người dùng mở màn hình.
+    if(!exportSelectedMonth){
+        exportSelectedMonth=currentKey;
+    }
+
+    // Nếu tháng đang chọn không còn hợp lệ trong danh sách hiện tại
+    // (ví dụ đã sang năm mới), chuyển về tháng thực tế.
+    const availableCurrentYear = exportSelectedMonth.startsWith(`${currentY}-`)
+        ? Number(exportSelectedMonth.slice(5)) <= currentM
+        : true;
+    if(!availableCurrentYear){
+        exportSelectedMonth=currentKey;
+    }
+
     const months=[];
-    [currentY,previousY].forEach(year=>{for(let m=1;m<=12;m++) months.push({key:`${year}-${String(m).padStart(2,"0")}`,year,month:m});});
-    box.innerHTML=months.map(item=>`<button type="button" class="export-month${item.key===exportSelectedMonth?' selected':''}" onclick="selectExportMonth('${item.key}')">Tháng ${String(item.month).padStart(2,'0')}<small>${item.year}</small></button>`).join("");
+
+    // Năm cũ -> năm mới. Năm trước giữ đủ 12 tháng.
+    for(let m=1;m<=12;m++){
+        months.push({
+            key:`${previousY}-${String(m).padStart(2,"0")}`,
+            year:previousY,
+            month:m
+        });
+    }
+
+    // Năm hiện tại chỉ tới tháng thực tế hiện tại.
+    for(let m=1;m<=currentM;m++){
+        months.push({
+            key:`${currentY}-${String(m).padStart(2,"0")}`,
+            year:currentY,
+            month:m
+        });
+    }
+
+    box.innerHTML=months.map(item=>{
+        const yearClass = item.year===currentY ? "current-year" : "previous-year";
+        const selectedClass = item.key===exportSelectedMonth ? " selected" : "";
+        return `<button type="button" class="export-month ${yearClass}${selectedClass}" onclick="selectExportMonth('${item.key}')">Tháng ${String(item.month).padStart(2,'0')}<small>${item.year}</small></button>`;
+    }).join("");
 }
 function selectExportMonth(key){exportSelectedMonth=key;renderExportMonths();}
+
+// Tự cập nhật danh sách tháng khi lịch thực tế bước sang tháng mới.
+// Kiểm tra mỗi phút để không cần người dùng tải lại trang.
+let lastExportCalendarKey = "";
+setInterval(()=>{
+    const now=new Date();
+    const key=`${now.getFullYear()}-${now.getMonth()+1}`;
+    if(key!==lastExportCalendarKey){
+        lastExportCalendarKey=key;
+        if(document.getElementById("exportScreen") && !document.getElementById("exportScreen").classList.contains("hidden")){
+            renderExportMonths();
+        }
+    }
+},60000);
 function csvCell(value){return `"${String(value??"").replaceAll('"','""')}"`;}
 
 function exportMonthData(year,month){
