@@ -763,6 +763,77 @@ button{
 }
 
 /* ==============================
+   QUICK OVERTIME ADD
+================================ */
+.quick-ot-date{
+    color:#777;
+    font-size:14px;
+    margin:-8px 0 18px;
+}
+.quick-ot-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:14px;
+}
+.quick-ot-field{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+.quick-ot-field label{
+    font-size:14px;
+    font-weight:700;
+    color:#211b52;
+}
+.quick-ot-field input{
+    width:100%;
+    padding:13px 12px;
+    border:1px solid #e0e0e7;
+    border-radius:14px;
+    background:#f7f8fa;
+    color:#211b52;
+    font:inherit;
+    font-size:16px;
+    outline:none;
+}
+.quick-ot-field input:focus{
+    border-color:#6847ff;
+    background:white;
+}
+.quick-ot-hint{
+    background:#eeeaff;
+    border-radius:15px;
+    padding:12px 14px;
+    color:#55506f;
+    font-size:13px;
+    line-height:1.45;
+    margin-bottom:14px;
+}
+.quick-ot-actions{
+    display:flex;
+    gap:10px;
+}
+.quick-ot-actions .primary{
+    flex:1;
+}
+.quick-ot-history{
+    width:100%;
+    margin-top:10px;
+    padding:11px;
+    border-radius:13px;
+    background:#f0efff;
+    color:#6847ff;
+    font-weight:700;
+    font-size:14px;
+}
+@media(max-width:420px){
+    .quick-ot-grid{
+        gap:9px;
+    }
+}
+
+/* ==============================
    OVERTIME LOG
 ================================ */
 
@@ -1478,6 +1549,13 @@ html, body{
     <link rel="apple-touch-icon" href="logo.webp">
     <meta name="theme-color" content="#168ff5">
 
+
+<style>
+.event-star{position:absolute;right:5px;top:3px;color:#ef4444;font-size:12px;line-height:1;z-index:3}.day{position:relative}
+.event-hint{background:#f3efff;color:#4f46e5;border-radius:14px;padding:12px 14px;margin-bottom:14px;text-align:center;font-size:14px}
+.event-year-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-height:55vh;overflow:auto;padding-right:2px}.event-month{background:#f8fafc;border-radius:14px;padding:10px}.event-month h3{margin:0 0 7px;text-align:center;font-size:15px;color:#22205b}.event-weekdays,.event-mini-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}.event-weekdays span{font-size:9px;text-align:center;color:#777}.event-day{position:relative;border:0;background:#fff;border-radius:7px;min-height:28px;font-size:11px;color:#22205b}.event-day.has-event{background:#fff1f2}.event-day i{position:absolute;right:1px;top:0;color:#ef4444;font-size:7px;font-style:normal}.event-empty{color:#777;padding:10px 0}.event-list-item{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid #eee;padding:10px 0}.event-note{font-size:12px;color:#777;margin-top:4px}.event-actions{display:flex;gap:6px;align-items:center;flex-shrink:0}.event-reminder-btn,.event-delete-btn{border:0;border-radius:10px;padding:8px 9px;font-size:11px;background:#eef2ff;color:#2670ff}.event-reminder-btn.enabled{background:#eaf8ee;color:#23823a}.event-delete-btn{background:#fff0f0;color:#e33}.leave-message{font-size:15px;line-height:1.6;background:#f3efff;border-radius:14px;padding:16px;margin:12px 0 16px;color:#27245e}.secondary{width:100%;border:0;border-radius:14px;padding:13px 16px;margin-top:10px;background:#eef1f5;color:#27245e;font-size:15px;font-weight:600}
+@media(max-width:600px){.event-year-grid{grid-template-columns:1fr 1fr}.event-list-item{align-items:flex-start;flex-direction:column}.event-actions{width:100%}.event-reminder-btn{flex:1}}
+</style>
 </head>
 
 <body>
@@ -1583,7 +1661,7 @@ html, body{
 
             <button
                 class="tool"
-                onclick="openOvertimeLog()">
+                onclick="openOvertimeQuickAdd()">
 
                 <div class="tool-icon">▣+</div>
 
@@ -1616,11 +1694,11 @@ html, body{
 
             <button
                 class="tool"
-                onclick="openAppendix('Lợi nhuận')">
+                onclick="openAnnualLeaveMenu()">
 
-                <div class="tool-icon">＄</div>
+                <div class="tool-icon">🌴</div>
 
-                Lợi nhuận
+                Phép Năm
 
             </button>
 
@@ -2197,6 +2275,8 @@ boards.forEach(board => {
     if(!board.standardDays) board.standardDays = 26;
     if(!board.hoursPerDay) board.hoursPerDay = 8;
     if(!board.overtimeRate) board.overtimeRate = 1.5;
+    if(board.annualLeave === undefined) board.annualLeave = 0;
+    if(!Array.isArray(board.events)) board.events = [];
 
     Object.values(board.attendance || {}).forEach(record => {
         if(record.overtimeHours === undefined){
@@ -2320,6 +2400,8 @@ function createBoard(){
         standardDays:26,
         hoursPerDay:8,
         overtimeRate:1.5,
+        annualLeave:0,
+        events:[],
 
         advance:0,
 
@@ -2548,6 +2630,15 @@ function renderCalendar(){
 
         div.innerText=day;
 
+        const eventForDay = (currentBoard.events || []).find(e => e.date === key);
+        if(eventForDay){
+            const star = document.createElement("span");
+            star.className = "event-star";
+            star.textContent = "★";
+            star.title = eventForDay.note || "Có sự kiện";
+            div.appendChild(star);
+        }
+
         if(record){
 
             const dot =
@@ -2601,6 +2692,9 @@ function openDay(day){
             currentMonth,
             day
         );
+
+    window.__editingAttendanceKey = key;
+    window.__editingOriginalStatus = Number(currentBoard.attendance[key]?.status) || 0;
 
     const oldRecord =
         currentBoard.attendance[key] || {};
@@ -2918,6 +3012,26 @@ function selectWorkType(type){
     }
 
     if(type === 3){
+        const originalStatus = Number(window.__editingOriginalStatus) || 0;
+        const isAlreadyPaidLeave = originalStatus === 3 || originalStatus === 3.0;
+        const entitlement = Math.max(0, Number(currentBoard?.annualLeave) || 0);
+        const used = Object.values(currentBoard?.attendance || {}).filter(r => {
+            const st = Number(r?.status);
+            return st === 3;
+        }).length;
+        const remaining = Math.max(0, entitlement - used);
+        if(!isAlreadyPaidLeave && remaining <= 0){
+            openModal(`
+                <h2>Hết phép năm</h2>
+                <div class="leave-message">Bạn đã sử dụng hết số phép năm được hưởng. Hãy cập nhật lại số phép năm trong mục Phép Năm nếu cần.</div>
+                <button class="primary" onclick="closeModal(); openAnnualLeaveMenu()">Cập nhật phép năm</button>
+                <button class="secondary" onclick="closeModal()">Ok</button>
+            `);
+            const originalInput = document.getElementById("selectedWorkType");
+            if(originalInput) originalInput.value = String(originalStatus || "");
+            return;
+        }
+
         document
             .querySelectorAll(".special-work-option")[1]
             ?.classList.add("selected");
@@ -3215,6 +3329,12 @@ function saveAttendance(key){
 
     updateSummary();
 
+    updateMonthStats();
+
+    if(type === 3){
+        showAnnualLeaveMessage();
+    }
+
 }
 
 
@@ -3285,12 +3405,16 @@ function openSalaryDetail(){
             return;
         }
 
+        // Nghỉ có lương vẫn được tính đủ 1 ngày công
+        // theo mức lương gốc / 26 ngày.
         const workMoney =
             status === 1
                 ? dailyRate
                 : status === 0.5
                     ? dailyRate * 0.5
-                    : 0;
+                    : isPaidLeave
+                        ? dailyRate
+                        : 0;
 
         const rate =
             Number(record.overtimeRate)
@@ -3350,9 +3474,13 @@ function openSalaryDetail(){
                                         ? "Cả ngày"
                                         : item.status === 0.5
                                             ? "1/2 công"
-                                            : item.status === 2
-                                                ? "Tăng ca cuối tuần/ngày"
-                                                : "Chỉ tăng ca"
+                                            : item.status === 3
+                                                ? "Nghỉ có lương"
+                                                : item.status === 4
+                                                    ? "Nghỉ không lương"
+                                                    : item.status === 2
+                                                        ? "Tăng ca cuối tuần/ngày"
+                                                        : "Chỉ tăng ca"
                                 }
                             </div>
                         </div>
@@ -3615,6 +3743,16 @@ function updateSummary(){
                 workedDays += 0.5;
             }
 
+            // Nghỉ có lương = 1 ngày công, lấy lương gốc / 26 ngày.
+            if(
+                status === 3
+                || status === "paidLeave"
+                || status === "paid_leave"
+                || status === "nghi_co_luong"
+            ){
+                earnedWork += dailyRate;
+            }
+
             const ot =
                 Math.max(
                     0,
@@ -3775,6 +3913,8 @@ function updateMonthStats(){
             || status === "nghi_co_luong"
         ){
             paidLeave += 1;
+            // Nghỉ có lương vẫn nhận đủ 1 ngày công.
+            earnedWork += dailyRate;
         }else if(
             status === 4
             || status === "4"
@@ -4049,6 +4189,149 @@ function money(value){
 /* =========================================
    APPENDIX
 ========================================= */
+
+function openOvertimeQuickAdd(){
+
+    if(!currentBoard){
+        return;
+    }
+
+    const today = new Date();
+    const todayKey = dateKey(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+    );
+
+    const existing = currentBoard.attendance?.[todayKey] || {};
+    const defaultHours = Number(existing.overtimeHours) || 0;
+    const defaultRate = Number(existing.overtimeRate)
+        || Number(currentBoard.overtimeRate)
+        || 1.5;
+
+    openModal(`
+        <button
+            class="close-btn"
+            onclick="closeModal()">
+            ×
+        </button>
+
+        <h2>Tăng ca</h2>
+
+        <div class="quick-ot-date">
+            Thêm trực tiếp tăng ca cho ngày hôm nay —
+            ${String(today.getDate()).padStart(2,"0")}/${String(today.getMonth()+1).padStart(2,"0")}/${today.getFullYear()}
+        </div>
+
+        <div class="quick-ot-grid">
+            <div class="quick-ot-field">
+                <label for="quickOtHours">Giờ tăng ca</label>
+                <input
+                    id="quickOtHours"
+                    type="number"
+                    min="0"
+                    max="24"
+                    step="0.5"
+                    inputmode="decimal"
+                    value="${defaultHours}">
+            </div>
+
+            <div class="quick-ot-field">
+                <label for="quickOtRate">Hệ số</label>
+                <input
+                    id="quickOtRate"
+                    type="number"
+                    min="1"
+                    max="10"
+                    step="0.5"
+                    inputmode="decimal"
+                    value="${defaultRate}">
+            </div>
+        </div>
+
+        <div class="quick-ot-hint">
+            Nhập số giờ và hệ số tăng ca. Dữ liệu sẽ được cộng vào ngày hôm nay và đồng bộ lên Firebase.
+        </div>
+
+        <div class="quick-ot-actions">
+            <button
+                type="button"
+                class="primary"
+                onclick="saveQuickOvertime('${todayKey}')">
+                Lưu tăng ca
+            </button>
+        </div>
+
+        <button
+            type="button"
+            class="quick-ot-history"
+            onclick="closeModal(); setTimeout(openOvertimeLog, 50)">
+            Xem lịch sử tăng ca
+        </button>
+    `);
+}
+
+function saveQuickOvertime(key){
+
+    if(!currentBoard){
+        return;
+    }
+
+    const hours = Math.max(
+        0,
+        Math.min(
+            24,
+            Number(document.getElementById("quickOtHours")?.value) || 0
+        )
+    );
+
+    const rate = Math.max(
+        1,
+        Math.min(
+            10,
+            Number(document.getElementById("quickOtRate")?.value) || 1.5
+        )
+    );
+
+    const old = currentBoard.attendance?.[key] || {};
+    const status = Number(old.status) || 0;
+
+    if((status === 3 || status === 4) && hours > 0){
+        alert("Ngày nghỉ có lương/không lương không thể thêm tăng ca.");
+        return;
+    }
+
+    if(!currentBoard.attendance){
+        currentBoard.attendance = {};
+    }
+
+    // Nếu nhập 0 giờ thì chỉ xoá phần tăng ca, giữ nguyên chấm công trong ngày.
+    if(hours <= 0){
+        if(old.status || old.note){
+            currentBoard.attendance[key] = {
+                ...old,
+                overtimeHours:0,
+                overtimeRate:rate
+            };
+        }else{
+            delete currentBoard.attendance[key];
+        }
+    }else{
+        currentBoard.attendance[key] = {
+            ...old,
+            status: old.status ?? 0,
+            overtimeHours:hours,
+            overtimeRate:rate,
+            note:old.note || ""
+        };
+    }
+
+    saveData();
+    closeModal();
+    renderCalendar();
+    updateSummary();
+}
+
 
 function openOvertimeLog(){
 
@@ -4366,6 +4649,186 @@ function formatDateVN(date){
 
 }
 
+
+
+function getPaidLeaveUsed(board=currentBoard){
+    const year = new Date().getFullYear();
+    return Object.entries(board?.attendance || {}).filter(([date,r]) => String(date).startsWith(String(year)+"-") && Number(r?.status) === 3).length;
+}
+
+function getAnnualLeaveRemaining(board=currentBoard){
+    const entitlement = Math.max(0, Number(board?.annualLeave) || 0);
+    return Math.max(0, entitlement - getPaidLeaveUsed(board));
+}
+
+function openAnnualLeaveMenu(){
+    if(!currentBoard){ return; }
+    openModal(`
+        <h2>Phép Năm</h2>
+        <div class="appendix-item">
+            Phép năm được hưởng
+            <strong>${Math.max(0, Number(currentBoard.annualLeave) || 0)} ngày</strong>
+        </div>
+        <div class="appendix-item">
+            Đã sử dụng
+            <strong>${getPaidLeaveUsed(currentBoard)} ngày</strong>
+        </div>
+        <div class="appendix-item">
+            Còn lại
+            <strong style="color:#2670ff">${getAnnualLeaveRemaining(currentBoard)} ngày</strong>
+        </div>
+        <input id="annualLeaveInput" class="input" type="number" min="0" step="0.5" value="${Math.max(0, Number(currentBoard.annualLeave) || 0)}" placeholder="Nhập số phép năm">
+        <button class="primary" onclick="saveAnnualLeave()">Lưu phép năm</button>
+        <button class="secondary" onclick="openEventCalendar()">📅 Ghi chú sự kiện</button>
+    `);
+}
+
+function saveAnnualLeave(){
+    const input = document.getElementById("annualLeaveInput");
+    const value = Math.max(0, Number(input?.value) || 0);
+    currentBoard.annualLeave = value;
+    saveData();
+    renderCalendar();
+    updateSummary();
+    updateMonthStats();
+    closeModal();
+    showAnnualLeaveMessage();
+}
+
+function showAnnualLeaveMessage(){
+    openModal(`
+        <h2>Phép Năm</h2>
+        <div class="leave-message">
+            Số phép năm còn lại là <strong>${getAnnualLeaveRemaining(currentBoard)} ngày</strong>.<br><br>
+            Nhớ ưu tiên nghỉ phép cho các dịp quan trọng bạn nhé!
+        </div>
+        <button class="primary" onclick="closeModal()">Ok</button>
+    `);
+}
+
+function openEventCalendar(){
+    if(!currentBoard) return;
+    if(!Array.isArray(currentBoard.events)) currentBoard.events = [];
+    const year = new Date().getFullYear();
+    const months = Array.from({length:12}, (_,m)=>{
+        const first = new Date(year,m,1);
+        let start = first.getDay(); start = start===0 ? 6 : start-1;
+        const days = new Date(year,m+1,0).getDate();
+        let html = `<div class="event-month"><h3>Tháng ${m+1}</h3><div class="event-weekdays"><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span></div><div class="event-mini-grid">`;
+        for(let i=0;i<start;i++) html += `<span></span>`;
+        for(let d=1;d<=days;d++){
+            const date = dateKey(year,m,d);
+            const has = currentBoard.events.some(e=>e.date===date);
+            html += `<button type="button" class="event-day ${has?'has-event':''}" onclick="openEventEditor('${date}')">${d}${has?'<i>★</i>':''}</button>`;
+        }
+        html += `</div></div>`;
+        return html;
+    }).join("");
+    openModal(`
+        <h2>Ghi chú sự kiện</h2>
+        <div class="event-hint">Bấm vào lịch để tạo sự kiện mới</div>
+        <div class="event-year-grid">${months}</div>
+        <div class="note-title" style="margin-top:18px">Sự kiện đã tạo</div>
+        <div id="eventList">${renderEventListHtml()}</div>
+        <button class="secondary" onclick="openAnnualLeaveMenu()">← Quay lại Phép Năm</button>
+    `);
+}
+
+function renderEventListHtml(){
+    const events = [...(currentBoard?.events || [])].sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+    if(!events.length) return `<div class="event-empty">Chưa có sự kiện nào.</div>`;
+    return events.map(e=>{
+        const enabled = !!e.reminderEnabled;
+        return `<div class="event-list-item">
+            <div><strong>★ ${formatDateVN(e.date)} ${escapeHtml(e.time||'09:00')}</strong><div class="event-note">${escapeHtml(e.note||'')}</div></div>
+            <div class="event-actions">
+                <button class="event-reminder-btn ${enabled?'enabled':''}" onclick="toggleEventReminder('${e.id}')">${enabled?'🔔 Đã bật':'🔔 Bật nhắc nhở sự kiện'}</button>
+                <button class="event-delete-btn" onclick="deleteEvent('${e.id}')">Xoá</button>
+            </div>
+        </div>`;
+    }).join("");
+}
+
+function openEventEditor(date){
+    const existing = (currentBoard.events || []).find(e=>e.date===date);
+    openModal(`
+        <h2>${existing?'Sửa':'Tạo'} sự kiện</h2>
+        <div class="day-date">${formatDateVN(date)}</div>
+        <div class="note-title">Thời gian sự kiện</div>
+        <input id="eventTimeInput" class="input" type="time" value="${escapeAttr(existing?.time||'09:00')}">
+        <div class="note-title">Nội dung ghi chú</div>
+        <textarea id="eventNoteInput" class="note-input" rows="4" placeholder="Nhập ghi chú sự kiện...">${escapeHtml(existing?.note||'')}</textarea>
+        <button class="primary" onclick="saveEvent('${date}', '${existing?.id||''}')">Lưu</button>
+        <button class="secondary" onclick="openEventCalendar()">Huỷ bỏ</button>
+    `);
+}
+
+function saveEvent(date, existingId=''){
+    const note = document.getElementById("eventNoteInput")?.value.trim() || "";
+    const time = document.getElementById("eventTimeInput")?.value || "09:00";
+    if(!note){ alert("Vui lòng nhập nội dung sự kiện."); return; }
+    if(!Array.isArray(currentBoard.events)) currentBoard.events=[];
+    if(existingId){
+        const e=currentBoard.events.find(x=>String(x.id)===String(existingId));
+        if(e){ e.note=note; e.time=time; e.reminderEnabled=false; e.lastNotified=""; }
+    }else{
+        currentBoard.events.push({id:String(Date.now()),date,time,note,reminderHours:1,reminderEnabled:false,lastNotified:""});
+    }
+    saveData();
+    renderCalendar();
+    closeModal();
+    openEventCalendar();
+}
+
+async function toggleEventReminder(id){
+    const e=(currentBoard.events||[]).find(x=>String(x.id)===String(id));
+    if(!e) return;
+    if(e.reminderEnabled){ e.reminderEnabled=false; saveData(); openEventCalendar(); return; }
+    const hours = Math.max(0.25, Number(prompt("Nhắc trước sự kiện bao nhiêu giờ?", String(e.reminderHours||1))) || 1);
+    e.reminderHours=hours;
+    if("Notification" in window){
+        if(Notification.permission === "default"){
+            const permission = await Notification.requestPermission();
+            if(permission !== "granted"){ alert("Bạn chưa cấp quyền thông báo."); return; }
+        }
+        if(Notification.permission !== "granted"){ alert("Hãy bật quyền Thông báo cho ứng dụng trong cài đặt trình duyệt/iPhone."); return; }
+        e.reminderEnabled=true;
+        e.lastNotified="";
+        saveData();
+        checkEventReminders();
+        openEventCalendar();
+    }else{
+        alert("Thiết bị/trình duyệt này chưa hỗ trợ thông báo.");
+    }
+}
+
+function deleteEvent(id){
+    if(!confirm("Xoá sự kiện này?")) return;
+    currentBoard.events=(currentBoard.events||[]).filter(e=>String(e.id)!==String(id));
+    saveData(); renderCalendar(); openEventCalendar();
+}
+
+function checkEventReminders(){
+    if(!currentBoard) return;
+    if(!('Notification' in window) || Notification.permission!=='granted') return;
+    const now=Date.now();
+    boards.forEach(board=>{
+        (board.events||[]).forEach(e=>{
+            if(!e.reminderEnabled || !e.date || !e.time) return;
+            const eventTime=new Date(`${e.date}T${e.time}:00`).getTime();
+            const remindAt=eventTime-(Number(e.reminderHours)||1)*3600000;
+            if(now>=remindAt && now<eventTime && e.lastNotified!==String(eventTime)){
+                new Notification("Nhắc nhở sự kiện", {body:`${e.note} — ${formatDateVN(e.date)} ${e.time}`});
+                e.lastNotified=String(eventTime);
+                saveData();
+            }
+        });
+    });
+}
+
+if(!window.__dgEventReminderTimer){
+    window.__dgEventReminderTimer=setInterval(checkEventReminders,30000);
+}
 
 function openAppendix(type){
 
@@ -5197,7 +5660,7 @@ function refreshDataScreen(){
     boards.forEach(board=>{
         const salary=Number(board.salary)||0, standard=Math.max(1,Number(board.standardDays)||26), hoursDay=Math.max(1,Number(board.hoursPerDay)||8), daily=salary/standard, hourly=daily/hoursDay, defaultRate=Number(board.overtimeRate)||1.5;
         Object.entries(board.attendance||{}).forEach(([date,r])=>{
-            const status=Number(r?.status)||0; const ot=Math.max(0,Number(r?.overtimeHours)||0); const rate=Math.max(1,Number(r?.overtimeRate)||defaultRate); const earned=(status===1?daily:status===0.5?daily*.5:0)+(ot*hourly*rate);
+            const status=Number(r?.status)||0; const ot=Math.max(0,Number(r?.overtimeHours)||0); const rate=Math.max(1,Number(r?.overtimeRate)||defaultRate); const earned=(status===1?daily:status===0.5?daily*.5:status===3?daily:0)+(ot*hourly*rate);
             if(status===1)workDays+=1; else if(status===0.5)workDays+=.5; otHours+=ot; total+=earned;
             if(!earliest||date<earliest)earliest=date; if(!latest||date>latest)latest=date;
             all.push({date,board:board.name,status,ot,rate,earned,note:r?.note||""});
@@ -5239,7 +5702,7 @@ async function logoutAccount(){
 }
 function exportAllData(){
     const rows=[["Ngày","Bảng","Công","Tăng ca (giờ)","Hệ số","Tiền công","Ghi chú"]];
-    boards.forEach(board=>{const salary=Number(board.salary)||0, standard=Math.max(1,Number(board.standardDays)||26), hoursDay=Math.max(1,Number(board.hoursPerDay)||8), daily=salary/standard, hourly=daily/hoursDay, def=Number(board.overtimeRate)||1.5;Object.entries(board.attendance||{}).sort(([a],[b])=>a.localeCompare(b)).forEach(([date,r])=>{const st=Number(r?.status)||0,ot=Number(r?.overtimeHours)||0,rate=Number(r?.overtimeRate)||def;const work=st===1?daily:st===.5?daily*.5:0;rows.push([date,board.name,st===1?"Cả ngày":st===.5?"1/2 công":st===3?"Nghỉ có lương":st===4?"Nghỉ không lương":"Khác",ot,rate,Math.round(work+ot*hourly*rate),String(r?.note||"").replaceAll('"','""')]);});});
+    boards.forEach(board=>{const salary=Number(board.salary)||0, standard=Math.max(1,Number(board.standardDays)||26), hoursDay=Math.max(1,Number(board.hoursPerDay)||8), daily=salary/standard, hourly=daily/hoursDay, def=Number(board.overtimeRate)||1.5;Object.entries(board.attendance||{}).sort(([a],[b])=>a.localeCompare(b)).forEach(([date,r])=>{const st=Number(r?.status)||0,ot=Number(r?.overtimeHours)||0,rate=Number(r?.overtimeRate)||def;const work=st===1?daily:st===.5?daily*.5:st===3?daily:0;rows.push([date,board.name,st===1?"Cả ngày":st===.5?"1/2 công":st===3?"Nghỉ có lương":st===4?"Nghỉ không lương":"Khác",ot,rate,Math.round(work+ot*hourly*rate),String(r?.note||"").replaceAll('"','""')]);});});
     const csv="\ufeff"+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="DG-Cham-Cong-Toan-Bo.csv";a.click();URL.revokeObjectURL(url);
 }
 
