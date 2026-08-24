@@ -1469,6 +1469,27 @@ html, body{
 .account-card{background:white;border-radius:24px;padding:20px;box-shadow:0 6px 18px rgba(40,40,80,.06);text-align:center}.account-avatar{width:88px;height:88px;border-radius:50%;object-fit:cover;background:#eeeaff;display:block;margin:2px auto 12px;border:3px solid white;box-shadow:0 5px 16px rgba(0,0,0,.12)}.account-name{font-size:22px;font-weight:800;color:#211b52}.account-email{font-size:14px;color:#888;margin-top:4px;word-break:break-word}.sync-status{margin:16px 0;padding:12px;border-radius:15px;background:#f1f8ff;color:#2670ff;font-size:14px}.account-actions{display:flex;flex-direction:column;gap:10px}.account-btn{width:100%;padding:14px;border-radius:15px;background:#f2f2f6;color:#211b52;font-size:16px;font-weight:700}.account-btn.primary-account{background:#6847ff;color:white}.account-btn.danger-account{background:#fff0f0;color:#e53935}.avatar-input{display:none}
 @media(max-width:480px){.screen-title{font-size:26px}.data-hero-value{font-size:26px}}
 
+
+/* SETTINGS SCREEN */
+.settings-screen{min-height:100vh;min-height:100dvh;box-sizing:border-box;padding:18px 20px 34px;background:#eef8f8}
+.settings-topbar{display:flex;align-items:center;gap:10px;margin:4px 0 18px}
+.settings-back{width:44px;height:44px;border:0;border-radius:14px;background:#fff;color:#211b52;font-size:34px;line-height:1;box-shadow:0 5px 14px rgba(40,40,80,.08)}
+.settings-title{margin:0;font-size:28px;font-weight:800;color:#211b52;flex:1}
+.settings-subtitle{font-size:13px;color:#777;margin:2px 0 16px}
+.settings-section{background:#fff;border-radius:22px;padding:18px 16px;margin-bottom:14px;box-shadow:0 6px 18px rgba(40,40,80,.06)}
+.settings-section h2{margin:0 0 6px;color:#211b52;font-size:21px;font-weight:800}
+.settings-section-note{font-size:12px;color:#8a8797;line-height:1.45;margin-bottom:14px}
+.settings-field{margin-bottom:13px}
+.settings-field:last-of-type{margin-bottom:0}
+.settings-label{display:block;color:#211b52;font-size:14px;font-weight:750;margin:0 0 6px 2px}
+.settings-input{width:100%;box-sizing:border-box;border:1px solid #dedee5;border-radius:15px;background:#fff;color:#211b52;font-size:16px;padding:13px 14px;outline:none}
+.settings-input:focus{border-color:#6847ff;box-shadow:0 0 0 3px rgba(104,71,255,.10)}
+.settings-help{margin:5px 3px 0;color:#a0a0a8;font-size:11px;line-height:1.35}
+.settings-save{width:100%;margin-top:15px}
+.settings-danger{width:100%;margin-top:4px;color:#e53935;background:#f1f2f5}
+.settings-rate-preview{margin-top:11px;background:#f3efff;border-radius:14px;padding:11px 13px;color:#5b45d8;font-size:12px;line-height:1.45}
+@media(max-width:480px){.settings-title{font-size:25px}.settings-section{padding:16px 14px}.settings-section h2{font-size:20px}}
+
 /* LOGIN */
 .login-screen{min-height:100vh;min-height:100dvh;box-sizing:border-box;padding:40px 24px 28px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#eef8f8 0%,#f7fbfb 100%)}
 .login-card{width:100%;max-width:430px;text-align:center}.login-logo{width:96px;height:96px;object-fit:cover;border-radius:24px;display:block;margin:0 auto 24px;box-shadow:0 12px 30px rgba(55,100,180,.18)}
@@ -2021,6 +2042,56 @@ html, body{
     </div>
 
 
+    <div id="settingsScreen" class="hidden settings-screen">
+        <div class="settings-topbar">
+            <button class="settings-back" type="button" onclick="closeSettingsScreen()">‹</button>
+            <h1 class="settings-title">Cài đặt bảng</h1>
+        </div>
+        <div class="settings-subtitle">Thiết lập riêng lương hành chính và lương tăng ca cho bảng này.</div>
+
+        <section class="settings-section">
+            <h2>Lương hành chính</h2>
+            <div class="settings-section-note">Các thông tin dùng để tính tiền công hành chính và ngày nghỉ có lương.</div>
+
+            <div class="settings-field">
+                <label class="settings-label" for="settingsJobName">Tên công việc</label>
+                <input id="settingsJobName" class="settings-input" type="text" autocomplete="off" placeholder="Ví dụ: Sofa" value="">
+                <div class="settings-help">Tên bảng/công việc bạn đang chấm công.</div>
+            </div>
+
+            <div class="settings-field">
+                <label class="settings-label" for="settingsSalary">Lương cơ bản</label>
+                <input id="settingsSalary" class="settings-input money-input" type="text" inputmode="numeric" autocomplete="off" placeholder="Ví dụ: 13.000.000" value="">
+                <div class="settings-help">Nhập mức lương cơ bản theo tháng. Số tiền sẽ tự động định dạng bằng dấu chấm.</div>
+            </div>
+
+            <div class="settings-field">
+                <label class="settings-label" for="settingsStandardDays">Số ngày nhận lương cơ bản</label>
+                <input id="settingsStandardDays" class="settings-input" type="number" min="1" step="1" inputmode="numeric" placeholder="Ví dụ: 26" value="">
+                <div class="settings-help">Ví dụ 26 ngày. Lương 1 ngày = lương cơ bản ÷ số ngày này.</div>
+            </div>
+
+            <button class="primary settings-save" type="button" onclick="saveAdministrativeSettings()">Lưu lương hành chính</button>
+        </section>
+
+        <section class="settings-section">
+            <h2>Lương Tăng Ca</h2>
+            <div class="settings-section-note">Tách riêng mức lương dùng để tính tăng ca. Hệ số tăng ca theo từng ngày vẫn giữ nguyên như giao diện chấm công hiện tại.</div>
+
+            <div class="settings-field">
+                <label class="settings-label" for="settingsOvertimeSalary">Mức lương tính tăng ca</label>
+                <input id="settingsOvertimeSalary" class="settings-input money-input" type="text" inputmode="numeric" autocomplete="off" placeholder="Ví dụ: 10.000.000" value="">
+                <div class="settings-help">Ví dụ lương hành chính 13.000.000đ nhưng tăng ca chỉ tính trên 10.000.000đ. Công thức tăng ca vẫn là: số giờ × đơn giá giờ tăng ca × hệ số.</div>
+            </div>
+
+            <div id="settingsOvertimeSalaryPreview" class="settings-rate-preview"></div>
+            <button class="primary settings-save" type="button" onclick="saveOvertimeSettings()">Lưu lương tăng ca</button>
+        </section>
+
+        <button class="secondary settings-danger" type="button" onclick="deleteBoardFromSettings()">Xóa bảng chấm công</button>
+    </div>
+
+
 <!-- BOTTOM -->
 
 <div
@@ -2342,6 +2413,7 @@ boards.forEach(board => {
     if(!board.standardDays) board.standardDays = 26;
     if(!board.hoursPerDay) board.hoursPerDay = 8;
     if(!board.overtimeRate) board.overtimeRate = 1.5;
+    if(!board.overtimeSalary) board.overtimeSalary = Number(board.salary) || 0;
     if(board.annualLeave === undefined) board.annualLeave = 0;
     if(!Array.isArray(board.events)) board.events = [];
 
@@ -2471,6 +2543,7 @@ function saveNewBoard(){
         standardDays:26,
         hoursPerDay:8,
         overtimeRate:1.5,
+        overtimeSalary:salary,
         annualLeave:0,
         events:[],
         advance:0,
@@ -3423,11 +3496,17 @@ function openSalaryDetail(){
     const hoursPerDay =
         Number(currentBoard.hoursPerDay) || 8;
 
+    const overtimeSalary =
+        Number(currentBoard.overtimeSalary) || salary;
+
     const dailyRate =
         salary / standardDays;
 
     const hourlyRate =
         dailyRate / hoursPerDay;
+
+    const overtimeHourlyRate =
+        overtimeSalary / standardDays / hoursPerDay;
 
     const records = [];
 
@@ -3485,7 +3564,7 @@ function openSalaryDetail(){
 
         const overtimeMoney =
             overtimeHours *
-            hourlyRate *
+            overtimeHourlyRate *
             rate;
 
         records.push({
@@ -3742,6 +3821,9 @@ function updateSummary(){
     const overtimeRate =
         Number(currentBoard.overtimeRate) || 1.5;
 
+    const overtimeSalary =
+        Number(currentBoard.overtimeSalary) || salary;
+
     const advance =
         Number(currentBoard.advance) || 0;
 
@@ -3773,6 +3855,9 @@ function updateSummary(){
 
     const hourlyRate =
         dailyRate / hoursPerDay;
+
+    const overtimeHourlyRate =
+        overtimeSalary / standardDays / hoursPerDay;
 
 
     let earnedWork = 0;
@@ -3832,7 +3917,7 @@ function updateSummary(){
             totalOvertimeHours += ot;
 
             earnedOvertime +=
-                hourlyRate *
+                overtimeHourlyRate *
                 ot *
                 dayOvertimeRate;
 
@@ -3940,6 +4025,9 @@ function updateMonthStats(){
     const hoursPerDay =
         Number(currentBoard.hoursPerDay) || 8;
 
+    const overtimeSalary =
+        Number(currentBoard.overtimeSalary) || salary;
+
     const defaultOvertimeRate =
         Number(currentBoard.overtimeRate) || 1.5;
 
@@ -3948,6 +4036,9 @@ function updateMonthStats(){
 
     const hourlyRate =
         dailyRate / hoursPerDay;
+
+    const overtimeHourlyRate =
+        overtimeSalary / standardDays / hoursPerDay;
 
     let earnedWork = 0;
     let earnedOvertime = 0;
@@ -4298,6 +4389,11 @@ document.addEventListener("blur", (event) => {
     }
 }, true);
 
+document.addEventListener("input", (event) => {
+    if(event.target?.id === "settingsOvertimeSalary") updateSettingsOvertimeSalaryPreview();
+});
+
+
 
 /* =========================================
    APPENDIX
@@ -4353,17 +4449,15 @@ function openOvertimeQuickAdd(){
                 <label for="quickOtRate">Hệ số</label>
                 <input
                     id="quickOtRate"
-                    type="number"
-                    min="1"
-                    max="10"
-                    step="0.5"
-                    inputmode="decimal"
-                    value="${defaultRate}">
+                    class="settings-input"
+                    type="text"
+                    value="X${String(defaultRate).replace(".",",")}"
+                    readonly>
             </div>
         </div>
 
         <div class="quick-ot-hint">
-            Nhập số giờ và hệ số tăng ca. Dữ liệu sẽ được cộng vào ngày hôm nay và đồng bộ lên Firebase.
+            Hệ số lấy tự động từ mục “Lương Tăng Ca” trong Cài đặt bảng. Nhập số giờ, tiền tăng ca sẽ tự cập nhật theo hệ số đã lưu.
         </div>
 
         <div class="quick-ot-actions">
@@ -4402,7 +4496,7 @@ function saveQuickOvertime(key){
         1,
         Math.min(
             10,
-            Number(document.getElementById("quickOtRate")?.value) || 1.5
+            Number(currentBoard.overtimeRate) || 1.5
         )
     );
 
@@ -4464,6 +4558,9 @@ function openOvertimeLog(){
     const hoursPerDay =
         Number(currentBoard.hoursPerDay) || 8;
 
+    const overtimeSalary =
+        Number(currentBoard.overtimeSalary) || salary;
+
     const defaultRate =
         Number(currentBoard.overtimeRate) || 1.5;
 
@@ -4472,6 +4569,9 @@ function openOvertimeLog(){
 
     const hourlyRate =
         dailyRate / hoursPerDay;
+
+    const overtimeHourlyRate =
+        overtimeSalary / standardDays / hoursPerDay;
 
     const records = [];
 
@@ -5242,137 +5342,120 @@ function openMore(){
 ========================================= */
 
 function openSettings(){
-
-    openModal(`
-
-        <h2>
-            Cài đặt bảng
-        </h2>
-
-        <input
-            id="newName"
-            class="input"
-            value="${escapeAttr(currentBoard.name)}">
-
-        <input
-            id="newSalary"
-            class="input money-input"
-            type="text"
-            inputmode="numeric"
-            autocomplete="off"
-            value="${formatMoneyInputValue(currentBoard.salary)}"
-            placeholder="Lương cơ bản/tháng">
-
-        <input
-            id="newStandardDays"
-            class="input"
-            type="number"
-            min="1"
-            value="${currentBoard.standardDays || 26}"
-            placeholder="Ngày công chuẩn/tháng">
-
-        <input
-            id="newHoursPerDay"
-            class="input"
-            type="number"
-            min="1"
-            step="0.5"
-            value="${currentBoard.hoursPerDay || 8}"
-            placeholder="Số giờ công/ngày">
-
-        <input
-            id="newOvertimeRate"
-            class="input"
-            type="number"
-            min="1"
-            step="0.1"
-            value="${currentBoard.overtimeRate || 1.5}"
-            placeholder="Hệ số tăng ca">
-
-        <button
-            class="primary"
-            onclick="saveSettings()">
-
-            Lưu thay đổi
-
-        </button>
-
-        <br><br>
-
-        <button
-            class="secondary"
-            style="width:100%;color:#ff4338"
-            onclick="deleteBoard()">
-
-            Xóa bảng chấm công
-
-        </button>
-
-    `);
-
+    if(!currentBoard){
+        alert("Vui lòng chọn bảng chấm công trước.");
+        return;
+    }
+    const appShell=document.querySelector(".app");
+    if(appShell) appShell.classList.add("screen-only");
+    hideAppScreens();
+    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+    document.getElementById("settingsScreen")?.classList.remove("hidden");
+    window.scrollTo({top:0,left:0,behavior:"instant"});
+    renderSettingsScreen();
 }
 
+function renderSettingsScreen(){
+    if(!currentBoard) return;
+    const name=document.getElementById("settingsJobName");
+    const salary=document.getElementById("settingsSalary");
+    const days=document.getElementById("settingsStandardDays");
+    const overtimeSalary=document.getElementById("settingsOvertimeSalary");
+    if(name) name.value=currentBoard.name||"";
+    if(salary) salary.value=formatMoneyInputValue(currentBoard.salary);
+    if(days) days.value=Number(currentBoard.standardDays)||26;
+    if(overtimeSalary){
+        const fallbackSalary = Number(currentBoard.salary)||0;
+        const value = Number(currentBoard.overtimeSalary)||fallbackSalary;
+        overtimeSalary.value=formatMoneyInputValue(value);
+    }
+    updateSettingsOvertimeSalaryPreview();
+    [salary,overtimeSalary].forEach(el=>{if(el) formatMoneyInput(el);});
+}
 
-function saveSettings(){
+function updateSettingsOvertimeSalaryPreview(){
+    const input=document.getElementById("settingsOvertimeSalary");
+    const preview=document.getElementById("settingsOvertimeSalaryPreview");
+    if(!preview) return;
 
-    currentBoard.name =
-        document.getElementById(
-            "newName"
-        ).value.trim();
+    const overtimeSalary =
+        Number(parseMoney(input?.value))
+        || Number(currentBoard?.overtimeSalary)
+        || Number(currentBoard?.salary)
+        || 0;
 
-    currentBoard.salary =
-        parseMoney(
-            document.getElementById(
-                "newSalary"
-            ).value
-        );
+    const standardDays =
+        Math.max(1, Number(currentBoard?.standardDays)||26);
 
-    currentBoard.standardDays =
-        Math.max(
-            1,
-            Number(
-                document.getElementById(
-                    "newStandardDays"
-                ).value
-            ) || 26
-        );
+    const hoursPerDay =
+        Math.max(1, Number(currentBoard?.hoursPerDay)||8);
 
-    currentBoard.hoursPerDay =
-        Math.max(
-            1,
-            Number(
-                document.getElementById(
-                    "newHoursPerDay"
-                ).value
-            ) || 8
-        );
+    const hourlyRate =
+        overtimeSalary / standardDays / hoursPerDay;
 
-    currentBoard.overtimeRate =
-        Math.max(
-            1,
-            Number(
-                document.getElementById(
-                    "newOvertimeRate"
-                ).value
-            ) || 1.5
-        );
+    preview.innerHTML =
+        `Đơn giá giờ tăng ca: <strong>${money(hourlyRate)}</strong>/giờ ` +
+        `· Mức tính tăng ca: <strong>${money(overtimeSalary)}</strong>/tháng.`;
+}
 
+function saveAdministrativeSettings(){
+    if(!currentBoard) return;
+    const name=document.getElementById("settingsJobName")?.value.trim()||"";
+    const salary=parseMoney(document.getElementById("settingsSalary")?.value);
+    const standardDays=Math.max(1,Number(document.getElementById("settingsStandardDays")?.value)||26);
+    if(!name){alert("Vui lòng nhập tên công việc.");return;}
+    if(salary<=0){alert("Vui lòng nhập lương cơ bản lớn hơn 0.");return;}
+    currentBoard.name=name;
+    currentBoard.salary=salary;
+    currentBoard.standardDays=standardDays;
+    saveData();
+    document.getElementById("detailName").innerText=currentBoard.name;
+    renderBoards();
+    renderCalendar();
+    updateSummary();
+    updateMonthStats();
+    renderSettingsScreen();
+    alert("Đã lưu lương hành chính.");
+}
+
+function saveOvertimeSettings(){
+    if(!currentBoard) return;
+
+    const overtimeSalary =
+        parseMoney(document.getElementById("settingsOvertimeSalary")?.value);
+
+    if(overtimeSalary<=0){
+        alert("Vui lòng nhập mức lương tính tăng ca lớn hơn 0.");
+        return;
+    }
+
+    // Chỉ thay đổi nguồn lương dùng để tính tăng ca.
+    // Công thức cũ vẫn giữ nguyên: số giờ × đơn giá giờ × hệ số.
+    currentBoard.overtimeSalary=overtimeSalary;
 
     saveData();
-
-    document.getElementById(
-        "detailName"
-    ).innerText =
-        currentBoard.name;
-
-    closeModal();
-
-    renderBoards();
-
+    renderCalendar();
     updateSummary();
-
+    updateMonthStats();
+    renderSettingsScreen();
+    alert(`Đã lưu mức lương tính tăng ca ${money(overtimeSalary)}.`);
 }
 
+function closeSettingsScreen(){
+    document.getElementById("settingsScreen")?.classList.add("hidden");
+    const appShell=document.querySelector(".app");
+    if(appShell) appShell.classList.remove("screen-only");
+    document.getElementById("detailScreen")?.classList.remove("hidden");
+    document.getElementById("bottomBar")?.classList.remove("hidden");
+    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.screen==="home"));
+    window.scrollTo({top:0,left:0,behavior:"instant"});
+    renderCalendar();
+    updateSummary();
+}
+
+function deleteBoardFromSettings(){
+    deleteBoard();
+}
 
 function deleteBoard(){
 
@@ -5629,11 +5712,17 @@ function openDayDetail(key){
     const overtimeRate =
         Number(currentBoard.overtimeRate) || 1.5;
 
+    const overtimeSalary =
+        Number(currentBoard.overtimeSalary) || salary;
+
     const dailyRate =
         salary / standardDays;
 
     const hourlyRate =
         dailyRate / hoursPerDay;
+
+    const overtimeHourlyRate =
+        overtimeSalary / standardDays / hoursPerDay;
 
     const workMoney =
         (Number(record.status) || 0) * dailyRate;
@@ -5651,7 +5740,7 @@ function openDayDetail(key){
 
     const overtimeMoney =
         overtimeHours *
-        hourlyRate *
+        overtimeHourlyRate *
         dayOvertimeRate;
 
     const earned =
@@ -5944,7 +6033,7 @@ function loginWithFacebook(){alert("Đăng nhập Facebook chưa được kết 
    HOME / DATA / ACCOUNT
 ========================================= */
 function hideAppScreens(){
-    ["listScreen","detailScreen","dataScreen","accountScreen","exportScreen","transactionScreen"].forEach(id=>document.getElementById(id)?.classList.add("hidden"));
+    ["listScreen","detailScreen","dataScreen","accountScreen","exportScreen","transactionScreen","settingsScreen"].forEach(id=>document.getElementById(id)?.classList.add("hidden"));
     document.getElementById("bottomBar")?.classList.add("hidden");
 }
 function navigateApp(screen){
@@ -5952,7 +6041,7 @@ function navigateApp(screen){
     // Data/Account nằm ngoài .app nên khi mở 2 màn hình này,
     // không để .app giữ lại một khoảng trống cao bằng 1 viewport.
     if(appShell){
-        appShell.classList.toggle("screen-only", screen === "data" || screen === "account" || screen === "export");
+        appShell.classList.toggle("screen-only", screen === "data" || screen === "account" || screen === "export" || screen === "settings");
     }
     // Mỗi lần chuyển tab phải đưa giao diện về đầu trang.
     // Nếu giữ scrollTop của màn hình trước, màn hình mới có thể bị trống
@@ -5980,6 +6069,13 @@ function navigateApp(screen){
     }else if(screen==="export"){
         document.getElementById("exportScreen")?.classList.remove("hidden");
         renderExportMonths();
+    }else if(screen==="settings"){
+        if(!currentBoard){
+            navigateApp("home");
+            return;
+        }
+        document.getElementById("settingsScreen")?.classList.remove("hidden");
+        renderSettingsScreen();
     }
 }
 function refreshDataScreen(){
@@ -5991,12 +6087,12 @@ function refreshDataScreen(){
     let currentMonthEntries=0, currentMonthWorkDays=0, currentMonthOtHours=0, currentMonthPaidLeave=0, currentMonthUnpaidLeave=0;
 
     boards.forEach(board=>{
-        const salary=Number(board.salary)||0, standard=Math.max(1,Number(board.standardDays)||26), hoursDay=Math.max(1,Number(board.hoursPerDay)||8), daily=salary/standard, hourly=daily/hoursDay, defaultRate=Number(board.overtimeRate)||1.5;
+        const salary=Number(board.salary)||0, overtimeSalary=Number(board.overtimeSalary)||salary, standard=Math.max(1,Number(board.standardDays)||26), hoursDay=Math.max(1,Number(board.hoursPerDay)||8), daily=salary/standard, hourly=daily/hoursDay, overtimeHourly=overtimeSalary/standard/hoursDay, defaultRate=Number(board.overtimeRate)||1.5;
         Object.entries(board.attendance||{}).forEach(([date,r])=>{
             const status=Number(r?.status)||0;
             const ot=Math.max(0,Number(r?.overtimeHours)||0);
             const rate=Math.max(1,Number(r?.overtimeRate)||defaultRate);
-            const earned=(status===1?daily:status===0.5?daily*.5:status===3?daily:0)+(ot*hourly*rate);
+            const earned=(status===1?daily:status===0.5?daily*.5:status===3?daily:0)+(ot*overtimeHourly*rate);
             if(status===1)workDays+=1; else if(status===0.5)workDays+=.5;
             otHours+=ot; total+=earned;
             if(!earliest||date<earliest)earliest=date;
@@ -6067,7 +6163,7 @@ async function logoutAccount(){
 }
 function exportAllData(){
     const rows=[["Ngày","Bảng","Công","Tăng ca (giờ)","Hệ số","Tiền công","Ghi chú"]];
-    boards.forEach(board=>{const salary=Number(board.salary)||0, standard=Math.max(1,Number(board.standardDays)||26), hoursDay=Math.max(1,Number(board.hoursPerDay)||8), daily=salary/standard, hourly=daily/hoursDay, def=Number(board.overtimeRate)||1.5;Object.entries(board.attendance||{}).sort(([a],[b])=>a.localeCompare(b)).forEach(([date,r])=>{const st=Number(r?.status)||0,ot=Number(r?.overtimeHours)||0,rate=Number(r?.overtimeRate)||def;const work=st===1?daily:st===.5?daily*.5:st===3?daily:0;rows.push([date,board.name,st===1?"Cả ngày":st===.5?"1/2 công":st===3?"Nghỉ có lương":st===4?"Nghỉ không lương":"Khác",ot,rate,Math.round(work+ot*hourly*rate),String(r?.note||"").replaceAll('"','""')]);});});
+    boards.forEach(board=>{const salary=Number(board.salary)||0, overtimeSalary=Number(board.overtimeSalary)||salary, standard=Math.max(1,Number(board.standardDays)||26), hoursDay=Math.max(1,Number(board.hoursPerDay)||8), daily=salary/standard, hourly=daily/hoursDay, overtimeHourly=overtimeSalary/standard/hoursDay, def=Number(board.overtimeRate)||1.5;Object.entries(board.attendance||{}).sort(([a],[b])=>a.localeCompare(b)).forEach(([date,r])=>{const st=Number(r?.status)||0,ot=Number(r?.overtimeHours)||0,rate=Number(r?.overtimeRate)||def;const work=st===1?daily:st===.5?daily*.5:st===3?daily:0;rows.push([date,board.name,st===1?"Cả ngày":st===.5?"1/2 công":st===3?"Nghỉ có lương":st===4?"Nghỉ không lương":"Khác",ot,rate,Math.round(work+ot*overtimeHourly*rate),String(r?.note||"").replaceAll('"','""')]);});});
     const csv="\ufeff"+rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\n");const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="DG-Cham-Cong-Toan-Bo.csv";a.click();URL.revokeObjectURL(url);
 }
 
