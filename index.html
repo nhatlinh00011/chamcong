@@ -2042,6 +2042,76 @@ html, body{
     </div>
 
 
+    <div id="overtimeScreen" class="hidden screen-pad overtime-screen">
+        <div class="overtime-topbar">
+            <button class="overtime-back" type="button" onclick="closeOvertimeScreen()">‹</button>
+            <div>
+                <h1 class="overtime-title">Tăng ca</h1>
+                <div class="overtime-subtitle">Nhập và theo dõi dữ liệu tăng ca</div>
+            </div>
+        </div>
+
+        <section class="overtime-add-card">
+            <h2>Thêm tăng ca hôm nay</h2>
+            <div id="overtimeTodayLabel" class="overtime-date-label"></div>
+            <div class="quick-ot-grid">
+                <div class="quick-ot-field">
+                    <label for="pageOtHours">Giờ tăng ca</label>
+                    <input id="pageOtHours" type="number" min="0" max="24" step="0.5" inputmode="decimal" value="0">
+                </div>
+                <div class="quick-ot-field">
+                    <label for="pageOtRate">Hệ số</label>
+                    <input id="pageOtRate" class="settings-input" type="text" value="X1,5" readonly>
+                </div>
+            </div>
+            <div id="overtimePageHint" class="quick-ot-hint"></div>
+            <button type="button" class="primary" onclick="savePageOvertime()">Lưu tăng ca</button>
+        </section>
+
+        <section class="overtime-history-card">
+            <div class="overtime-history-head">
+                <div>
+                    <h2>Lịch sử tăng ca</h2>
+                    <div id="overtimeMonthLabel" class="overtime-date-label"></div>
+                </div>
+            </div>
+            <div id="overtimePageSummary" class="overtime-summary"></div>
+            <div id="overtimePageLog" class="overtime-log"></div>
+        </section>
+    </div>
+
+    <div id="annualLeaveScreen" class="hidden screen-pad annual-leave-screen">
+        <div class="annual-topbar">
+            <button class="annual-back" type="button" onclick="closeAnnualLeaveScreen()">‹</button>
+            <div>
+                <h1 class="annual-title">Phép Năm</h1>
+                <div class="annual-subtitle">Quản lý phép năm và ghi chú sự kiện</div>
+            </div>
+        </div>
+
+        <section class="annual-card">
+            <h2>Phép Năm</h2>
+            <div class="annual-stat-grid">
+                <div><span>Được hưởng</span><strong id="annualEntitlement">0 ngày</strong></div>
+                <div><span>Đã sử dụng</span><strong id="annualUsed">0 ngày</strong></div>
+                <div><span>Còn lại</span><strong id="annualRemaining">0 ngày</strong></div>
+            </div>
+            <label class="settings-label" for="annualLeavePageInput">Số phép năm được hưởng</label>
+            <input id="annualLeavePageInput" class="settings-input" type="number" min="0" step="0.5" inputmode="decimal" placeholder="Ví dụ: 12">
+            <div class="settings-help">Nhập tổng số ngày phép năm bạn được hưởng trong năm.</div>
+            <button class="primary settings-save" type="button" onclick="saveAnnualLeavePage()">Lưu phép năm</button>
+            <div id="annualLeaveMessage" class="leave-message annual-inline-message hidden"></div>
+            <button id="annualLeaveOk" class="secondary annual-ok hidden" type="button" onclick="hideAnnualLeaveMessage()">Ok</button>
+        </section>
+
+        <section class="annual-card event-entry-card">
+            <h2>Ghi chú sự kiện</h2>
+            <div class="annual-event-note">Bấm vào nút bên dưới để mở lịch năm và tạo ghi chú nhắc nhở cho từng ngày.</div>
+            <button class="secondary" type="button" onclick="openEventCalendar()">📅 Ghi chú sự kiện</button>
+        </section>
+    </div>
+
+
     <div id="settingsScreen" class="hidden settings-screen">
         <div class="settings-topbar">
             <button class="settings-back" type="button" onclick="closeSettingsScreen()">‹</button>
@@ -4331,11 +4401,10 @@ function formatWorkDays(value){
 ========================================= */
 
 function money(value){
-
-    return Number(value)
-        .toLocaleString("vi-VN")
-        + " đ";
-
+    // Chỉ hiển thị phần nguyên của số tiền, bỏ phần lẻ phía sau.
+    // Ví dụ: 4.777.644,231 → 4.777.644 đ
+    const n = Math.floor(Number(value) || 0);
+    return n.toLocaleString("vi-VN") + " đ";
 }
 
 // Chuẩn hoá số tiền khi người dùng nhập: 2000000 → 2.000.000
@@ -4400,443 +4469,103 @@ document.addEventListener("input", (event) => {
 ========================================= */
 
 function openOvertimeQuickAdd(){
+    if(!currentBoard) return;
+    const appShell=document.querySelector(".app");
+    if(appShell) appShell.classList.add("screen-only");
+    hideAppScreens();
+    document.getElementById("overtimeScreen")?.classList.remove("hidden");
+    document.getElementById("bottomBar")?.classList.add("hidden");
+    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+    window.scrollTo({top:0,left:0,behavior:"instant"});
+    renderOvertimeScreen();
+}
 
-    if(!currentBoard){
-        return;
+function closeOvertimeScreen(){
+    document.getElementById("overtimeScreen")?.classList.add("hidden");
+    const appShell=document.querySelector(".app");
+    if(appShell) appShell.classList.remove("screen-only");
+    document.getElementById("detailScreen")?.classList.remove("hidden");
+    document.getElementById("bottomBar")?.classList.remove("hidden");
+    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.screen==="home"));
+    window.scrollTo({top:0,left:0,behavior:"instant"});
+    renderCalendar(); updateSummary(); updateMonthStats();
+}
+
+function renderOvertimeScreen(){
+    if(!currentBoard) return;
+    const today=new Date();
+    const todayKey=dateKey(today.getFullYear(),today.getMonth(),today.getDate());
+    const existing=currentBoard.attendance?.[todayKey]||{};
+    const defaultHours=Number(existing.overtimeHours)||0;
+    const defaultRate=Number(existing.overtimeRate)||Number(currentBoard.overtimeRate)||1.5;
+    const hoursEl=document.getElementById("pageOtHours");
+    const rateEl=document.getElementById("pageOtRate");
+    if(hoursEl) hoursEl.value=defaultHours;
+    if(rateEl) rateEl.value=`X${String(defaultRate).replace(".",",")}`;
+    const dateLabel=document.getElementById("overtimeTodayLabel");
+    if(dateLabel) dateLabel.textContent=`Ngày hôm nay — ${String(today.getDate()).padStart(2,"0")}/${String(today.getMonth()+1).padStart(2,"0")}/${today.getFullYear()}`;
+    const hint=document.getElementById("overtimePageHint");
+    if(hint) hint.textContent="Hệ số lấy tự động từ cài đặt tăng ca. Nhập số giờ, tiền tăng ca sẽ tự cập nhật theo hệ số đã lưu.";
+    renderOvertimeHistoryIntoPage();
+}
+
+function savePageOvertime(){
+    if(!currentBoard) return;
+    const today=new Date();
+    const key=dateKey(today.getFullYear(),today.getMonth(),today.getDate());
+    const hours=Math.max(0,Math.min(24,Number(document.getElementById("pageOtHours")?.value)||0));
+    const rate=Math.max(1,Math.min(10,Number(currentBoard.overtimeRate)||1.5));
+    const old=currentBoard.attendance?.[key]||{};
+    const status=Number(old.status)||0;
+    if((status===3||status===4)&&hours>0){alert("Ngày nghỉ có lương/không lương không thể thêm tăng ca.");return;}
+    if(!currentBoard.attendance) currentBoard.attendance={};
+    if(hours<=0){
+        if(old.status||old.note) currentBoard.attendance[key]={...old,overtimeHours:0,overtimeRate:rate};
+        else delete currentBoard.attendance[key];
+    }else{
+        currentBoard.attendance[key]={...old,status:old.status??0,overtimeHours:hours,overtimeRate:rate,note:old.note||""};
     }
+    saveData(); renderCalendar(); updateSummary(); updateMonthStats(); renderOvertimeScreen();
+}
 
-    const today = new Date();
-    const todayKey = dateKey(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate()
-    );
-
-    const existing = currentBoard.attendance?.[todayKey] || {};
-    const defaultHours = Number(existing.overtimeHours) || 0;
-    const defaultRate = Number(existing.overtimeRate)
-        || Number(currentBoard.overtimeRate)
-        || 1.5;
-
-    openModal(`
-        <button
-            class="close-btn"
-            onclick="closeModal()">
-            ×
-        </button>
-
-        <h2>Tăng ca</h2>
-
-        <div class="quick-ot-date">
-            Thêm trực tiếp tăng ca cho ngày hôm nay —
-            ${String(today.getDate()).padStart(2,"0")}/${String(today.getMonth()+1).padStart(2,"0")}/${today.getFullYear()}
-        </div>
-
-        <div class="quick-ot-grid">
-            <div class="quick-ot-field">
-                <label for="quickOtHours">Giờ tăng ca</label>
-                <input
-                    id="quickOtHours"
-                    type="number"
-                    min="0"
-                    max="24"
-                    step="0.5"
-                    inputmode="decimal"
-                    value="${defaultHours}">
-            </div>
-
-            <div class="quick-ot-field">
-                <label for="quickOtRate">Hệ số</label>
-                <input
-                    id="quickOtRate"
-                    class="settings-input"
-                    type="text"
-                    value="X${String(defaultRate).replace(".",",")}"
-                    readonly>
-            </div>
-        </div>
-
-        <div class="quick-ot-hint">
-            Hệ số lấy tự động từ mục “Lương Tăng Ca” trong Cài đặt bảng. Nhập số giờ, tiền tăng ca sẽ tự cập nhật theo hệ số đã lưu.
-        </div>
-
-        <div class="quick-ot-actions">
-            <button
-                type="button"
-                class="primary"
-                onclick="saveQuickOvertime('${todayKey}')">
-                Lưu tăng ca
-            </button>
-        </div>
-
-        <button
-            type="button"
-            class="quick-ot-history"
-            onclick="closeModal(); setTimeout(openOvertimeLog, 50)">
-            Xem lịch sử tăng ca
-        </button>
-    `);
+function renderOvertimeHistoryIntoPage(){
+    const monthPrefix=`${currentYear}-${String(currentMonth+1).padStart(2,"0")}-`;
+    const salary=Number(currentBoard.salary)||0;
+    const standardDays=Number(currentBoard.standardDays)||26;
+    const hoursPerDay=Number(currentBoard.hoursPerDay)||8;
+    const overtimeSalary=Number(currentBoard.overtimeSalary)||salary;
+    const defaultRate=Number(currentBoard.overtimeRate)||1.5;
+    const overtimeHourlyRate=overtimeSalary/standardDays/hoursPerDay;
+    const records=[];
+    Object.entries(currentBoard.attendance||{}).forEach(([date,record])=>{
+        if(!date.startsWith(monthPrefix)) return;
+        const hours=Number(record.overtimeHours)||0; if(hours<=0)return;
+        const rate=Math.max(1,Number(record.overtimeRate)||defaultRate);
+        const moneyValue=hours*overtimeHourlyRate*rate;
+        const dateObj=new Date(`${date}T00:00:00`);
+        const weekday=["Chủ nhật","Thứ 2","Thứ 3","Thứ 4","Thứ 5","Thứ 6","Thứ 7"][dateObj.getDay()];
+        records.push({date,weekday,hours,rate,money:moneyValue,note:record.note||""});
+    });
+    records.sort((a,b)=>a.date.localeCompare(b.date));
+    const totalHours=records.reduce((sum,x)=>sum+x.hours,0);
+    const totalMoney=records.reduce((sum,x)=>sum+x.money,0);
+    const monthLabel=document.getElementById("overtimeMonthLabel");
+    if(monthLabel) monthLabel.textContent=`Tháng ${String(currentMonth+1).padStart(2,"0")}/${currentYear}`;
+    const summary=document.getElementById("overtimePageSummary");
+    if(summary) summary.innerHTML=`<div class="overtime-summary-row"><span>Tổng số giờ tăng ca</span><strong>${formatHours(totalHours)}</strong></div><div class="overtime-summary-row"><span>Tổng tiền tăng ca</span><strong>${money(totalMoney)}</strong></div>`;
+    const log=document.getElementById("overtimePageLog");
+    if(!log)return;
+    log.innerHTML=records.length?records.map(item=>`<div class="overtime-log-item" onclick="openDayDetail('${item.date}')"><div class="overtime-log-head"><div class="overtime-log-date">${formatDateVN(item.date)} · ${item.weekday}</div><div class="overtime-log-money">${money(item.money)}</div></div><div class="overtime-log-detail">Tăng ca: <strong>${formatHours(item.hours)}</strong> · Hệ số: <strong>X${String(item.rate).replace(".",",")}</strong></div>${item.note?`<div class="overtime-log-detail" style="margin-top:4px">Ghi chú: ${escapeHtml(item.note)}</div>`:""}</div>`).join(""):`<div class="transaction-empty">Chưa có ngày nào được chấm tăng ca trong tháng ${String(currentMonth+1).padStart(2,"0")}/${currentYear}.</div>`;
 }
 
 function saveQuickOvertime(key){
-
-    if(!currentBoard){
-        return;
-    }
-
-    const hours = Math.max(
-        0,
-        Math.min(
-            24,
-            Number(document.getElementById("quickOtHours")?.value) || 0
-        )
-    );
-
-    const rate = Math.max(
-        1,
-        Math.min(
-            10,
-            Number(currentBoard.overtimeRate) || 1.5
-        )
-    );
-
-    const old = currentBoard.attendance?.[key] || {};
-    const status = Number(old.status) || 0;
-
-    if((status === 3 || status === 4) && hours > 0){
-        alert("Ngày nghỉ có lương/không lương không thể thêm tăng ca.");
-        return;
-    }
-
-    if(!currentBoard.attendance){
-        currentBoard.attendance = {};
-    }
-
-    // Nếu nhập 0 giờ thì chỉ xoá phần tăng ca, giữ nguyên chấm công trong ngày.
-    if(hours <= 0){
-        if(old.status || old.note){
-            currentBoard.attendance[key] = {
-                ...old,
-                overtimeHours:0,
-                overtimeRate:rate
-            };
-        }else{
-            delete currentBoard.attendance[key];
-        }
-    }else{
-        currentBoard.attendance[key] = {
-            ...old,
-            status: old.status ?? 0,
-            overtimeHours:hours,
-            overtimeRate:rate,
-            note:old.note || ""
-        };
-    }
-
-    saveData();
-    closeModal();
-    renderCalendar();
-    updateSummary();
+    // Tương thích với dữ liệu/code cũ: giao diện mới dùng savePageOvertime().
+    savePageOvertime();
 }
-
 
 function openOvertimeLog(){
-
-    if(!currentBoard){
-        return;
-    }
-
-    const monthPrefix =
-        `${currentYear}-${String(currentMonth+1).padStart(2,"0")}-`;
-
-    const salary =
-        Number(currentBoard.salary) || 0;
-
-    const standardDays =
-        Number(currentBoard.standardDays) || 26;
-
-    const hoursPerDay =
-        Number(currentBoard.hoursPerDay) || 8;
-
-    const overtimeSalary =
-        Number(currentBoard.overtimeSalary) || salary;
-
-    const defaultRate =
-        Number(currentBoard.overtimeRate) || 1.5;
-
-    const dailyRate =
-        salary / standardDays;
-
-    const hourlyRate =
-        dailyRate / hoursPerDay;
-
-    const overtimeHourlyRate =
-        overtimeSalary / standardDays / hoursPerDay;
-
-    const records = [];
-
-    Object.entries(
-        currentBoard.attendance || {}
-    ).forEach(([date, record]) => {
-
-        if(!date.startsWith(monthPrefix)){
-            return;
-        }
-
-        const hours =
-            Number(record.overtimeHours) || 0;
-
-        if(hours <= 0){
-            return;
-        }
-
-        const rate =
-            Math.max(
-                1,
-                Number(record.overtimeRate)
-                    || defaultRate
-            );
-
-        const moneyValue =
-            hours *
-            hourlyRate *
-            rate;
-
-        const dateObj =
-            new Date(`${date}T00:00:00`);
-
-        const weekday =
-            [
-                "Chủ nhật",
-                "Thứ 2",
-                "Thứ 3",
-                "Thứ 4",
-                "Thứ 5",
-                "Thứ 6",
-                "Thứ 7"
-            ][dateObj.getDay()];
-
-        records.push({
-            date,
-            weekday,
-            hours,
-            rate,
-            money:moneyValue,
-            note:record.note || ""
-        });
-
-    });
-
-
-    records.sort(
-        (a,b)=>a.date.localeCompare(b.date)
-    );
-
-
-    const totalHours =
-        records.reduce(
-            (sum,item)=>sum + item.hours,
-            0
-        );
-
-    const totalMoney =
-        records.reduce(
-            (sum,item)=>sum + item.money,
-            0
-        );
-
-
-    /*
-     * Tổng hợp theo từng hệ số.
-     * Ví dụ X1,5: tổng bao nhiêu giờ + bao nhiêu tiền.
-     */
-    const coefficientMap = {};
-
-    records.forEach(item => {
-
-        const key =
-            Number(item.rate).toFixed(1);
-
-        if(!coefficientMap[key]){
-            coefficientMap[key] = {
-                rate:item.rate,
-                hours:0,
-                money:0,
-                days:0
-            };
-        }
-
-        coefficientMap[key].hours += item.hours;
-        coefficientMap[key].money += item.money;
-        coefficientMap[key].days += 1;
-
-    });
-
-
-    const coefficientRows =
-        Object.values(coefficientMap)
-            .sort((a,b)=>a.rate-b.rate)
-            .map(item=>`
-
-                <div class="appendix-item">
-
-                    <span>
-                        Hệ số
-                        <strong>
-                            X${String(item.rate).replace(".", ",")}
-                        </strong>
-                    </span>
-
-                    <span style="text-align:right">
-                        <strong>
-                            ${formatHours(item.hours)}
-                        </strong>
-
-                        <br>
-
-                        <small style="color:#777">
-                            ${item.days} ngày ·
-                            ${money(item.money)}
-                        </small>
-                    </span>
-
-                </div>
-
-            `)
-            .join("");
-
-
-    const listHtml =
-        records.length
-            ? records.map(item=>`
-
-                <div
-                    class="overtime-log-item"
-                    onclick="openDayDetail('${item.date}')">
-
-                    <div class="overtime-log-head">
-
-                        <div class="overtime-log-date">
-                            ${formatDateVN(item.date)}
-                            · ${item.weekday}
-                        </div>
-
-                        <div class="overtime-log-money">
-                            ${money(item.money)}
-                        </div>
-
-                    </div>
-
-                    <div class="overtime-log-detail">
-                        Tăng ca:
-                        <strong>
-                            ${formatHours(item.hours)}
-                        </strong>
-                        · Hệ số:
-                        <strong>
-                            X${String(item.rate).replace(".", ",")}
-                        </strong>
-                    </div>
-
-                    ${
-                        item.note
-                            ? `
-                                <div
-                                    class="overtime-log-detail"
-                                    style="margin-top:4px">
-                                    Ghi chú:
-                                    ${escapeHtml(item.note)}
-                                </div>
-                            `
-                            : ""
-                    }
-
-                </div>
-
-            `).join("")
-            : `
-                <div
-                    style="
-                        text-align:center;
-                        color:#888;
-                        padding:24px 10px;">
-                    Chưa có ngày nào được chấm tăng ca
-                    trong tháng
-                    ${String(currentMonth+1).padStart(2,"0")}/${currentYear}.
-                </div>
-            `;
-
-
-    openModal(`
-
-        <h2>
-            Tăng ca
-        </h2>
-
-        <div
-            style="
-                color:#777;
-                margin-top:-8px;
-                margin-bottom:10px;">
-            Tháng
-            ${String(currentMonth+1).padStart(2,"0")}/${currentYear}
-        </div>
-
-
-        <div class="overtime-summary">
-
-            <div class="overtime-summary-row">
-                <span>
-                    Tổng số giờ tăng ca
-                </span>
-
-                <strong>
-                    ${formatHours(totalHours)}
-                </strong>
-            </div>
-
-            <div class="overtime-summary-row">
-                <span>
-                    Tổng tiền tăng ca
-                </span>
-
-                <strong>
-                    ${money(totalMoney)}
-                </strong>
-            </div>
-
-        </div>
-
-
-        ${
-            records.length
-                ? `
-                    <div class="note-title">
-                        Tổng hợp hệ số tăng ca
-                    </div>
-
-                    <div>
-                        ${coefficientRows}
-                    </div>
-                `
-                : ""
-        }
-
-
-        <div
-            class="note-title"
-            style="margin-top:20px">
-            Chi tiết theo ngày
-        </div>
-
-        <div class="overtime-log">
-            ${listHtml}
-        </div>
-
-    `);
-
+    openOvertimeQuickAdd();
 }
-
 
 function formatHours(hours){
 
@@ -4875,49 +4604,62 @@ function getAnnualLeaveRemaining(board=currentBoard){
 }
 
 function openAnnualLeaveMenu(){
-    if(!currentBoard){ return; }
-    openModal(`
-        <h2>Phép Năm</h2>
-        <div class="appendix-item">
-            Phép năm được hưởng
-            <strong>${Math.max(0, Number(currentBoard.annualLeave) || 0)} ngày</strong>
-        </div>
-        <div class="appendix-item">
-            Đã sử dụng
-            <strong>${getPaidLeaveUsed(currentBoard)} ngày</strong>
-        </div>
-        <div class="appendix-item">
-            Còn lại
-            <strong style="color:#2670ff">${getAnnualLeaveRemaining(currentBoard)} ngày</strong>
-        </div>
-        <input id="annualLeaveInput" class="input" type="number" min="0" step="0.5" value="${Math.max(0, Number(currentBoard.annualLeave) || 0)}" placeholder="Nhập số phép năm">
-        <button class="primary" onclick="saveAnnualLeave()">Lưu phép năm</button>
-        <button class="secondary" onclick="openEventCalendar()">📅 Ghi chú sự kiện</button>
-    `);
+    if(!currentBoard) return;
+    const appShell=document.querySelector(".app");
+    if(appShell) appShell.classList.add("screen-only");
+    hideAppScreens();
+    document.getElementById("annualLeaveScreen")?.classList.remove("hidden");
+    document.getElementById("bottomBar")?.classList.add("hidden");
+    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+    window.scrollTo({top:0,left:0,behavior:"instant"});
+    renderAnnualLeaveScreen();
 }
 
-function saveAnnualLeave(){
-    const input = document.getElementById("annualLeaveInput");
-    const value = Math.max(0, Number(input?.value) || 0);
-    currentBoard.annualLeave = value;
-    saveData();
-    renderCalendar();
-    updateSummary();
-    updateMonthStats();
-    closeModal();
-    showAnnualLeaveMessage();
+function renderAnnualLeaveScreen(){
+    if(!currentBoard)return;
+    const entitlement=Math.max(0,Number(currentBoard.annualLeave)||0);
+    const used=getPaidLeaveUsed(currentBoard);
+    const remaining=Math.max(0,entitlement-used);
+    const input=document.getElementById("annualLeavePageInput");
+    if(input) input.value=entitlement;
+    const a=document.getElementById("annualEntitlement"); if(a)a.textContent=`${entitlement} ngày`;
+    const u=document.getElementById("annualUsed"); if(u)u.textContent=`${used} ngày`;
+    const r=document.getElementById("annualRemaining"); if(r)r.textContent=`${remaining} ngày`;
 }
 
-function showAnnualLeaveMessage(){
-    openModal(`
-        <h2>Phép Năm</h2>
-        <div class="leave-message">
-            Số phép năm còn lại là <strong>${getAnnualLeaveRemaining(currentBoard)} ngày</strong>.<br><br>
-            Nhớ ưu tiên nghỉ phép cho các dịp quan trọng bạn nhé!
-        </div>
-        <button class="primary" onclick="closeModal()">Ok</button>
-    `);
+function closeAnnualLeaveScreen(){
+    document.getElementById("annualLeaveScreen")?.classList.add("hidden");
+    const appShell=document.querySelector(".app");
+    if(appShell) appShell.classList.remove("screen-only");
+    document.getElementById("detailScreen")?.classList.remove("hidden");
+    document.getElementById("bottomBar")?.classList.remove("hidden");
+    document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.screen==="home"));
+    window.scrollTo({top:0,left:0,behavior:"instant"});
+    renderCalendar(); updateSummary(); updateMonthStats();
 }
+
+function saveAnnualLeavePage(){
+    if(!currentBoard)return;
+    const value=Math.max(0,Number(document.getElementById("annualLeavePageInput")?.value)||0);
+    currentBoard.annualLeave=value; saveData(); renderCalendar(); updateSummary(); updateMonthStats(); renderAnnualLeaveScreen();
+    showAnnualLeaveMessageInline();
+}
+
+function showAnnualLeaveMessageInline(){
+    const box=document.getElementById("annualLeaveMessage");
+    const ok=document.getElementById("annualLeaveOk");
+    if(!box)return;
+    box.innerHTML=`Số phép năm còn lại là <strong>${getAnnualLeaveRemaining(currentBoard)} ngày</strong>.<br><br>Nhớ ưu tiên nghỉ phép cho các dịp quan trọng bạn nhé!`;
+    box.classList.remove("hidden"); if(ok)ok.classList.remove("hidden");
+}
+function hideAnnualLeaveMessage(){
+    document.getElementById("annualLeaveMessage")?.classList.add("hidden");
+    document.getElementById("annualLeaveOk")?.classList.add("hidden");
+}
+
+function saveAnnualLeave(){ saveAnnualLeavePage(); }
+
+function showAnnualLeaveMessage(){ showAnnualLeaveMessageInline(); }
 
 function openEventCalendar(){
     if(!currentBoard) return;
@@ -6033,7 +5775,7 @@ function loginWithFacebook(){alert("Đăng nhập Facebook chưa được kết 
    HOME / DATA / ACCOUNT
 ========================================= */
 function hideAppScreens(){
-    ["listScreen","detailScreen","dataScreen","accountScreen","exportScreen","transactionScreen","settingsScreen"].forEach(id=>document.getElementById(id)?.classList.add("hidden"));
+    ["listScreen","detailScreen","dataScreen","accountScreen","exportScreen","transactionScreen","settingsScreen","overtimeScreen","annualLeaveScreen"].forEach(id=>document.getElementById(id)?.classList.add("hidden"));
     document.getElementById("bottomBar")?.classList.add("hidden");
 }
 function navigateApp(screen){
@@ -6041,7 +5783,7 @@ function navigateApp(screen){
     // Data/Account nằm ngoài .app nên khi mở 2 màn hình này,
     // không để .app giữ lại một khoảng trống cao bằng 1 viewport.
     if(appShell){
-        appShell.classList.toggle("screen-only", screen === "data" || screen === "account" || screen === "export" || screen === "settings");
+        appShell.classList.toggle("screen-only", screen === "data" || screen === "account" || screen === "export" || screen === "settings" || screen === "overtime" || screen === "annualLeave");
     }
     // Mỗi lần chuyển tab phải đưa giao diện về đầu trang.
     // Nếu giữ scrollTop của màn hình trước, màn hình mới có thể bị trống
