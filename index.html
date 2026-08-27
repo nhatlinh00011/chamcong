@@ -863,36 +863,52 @@ button{
 
 
 /* ==============================
-   OVERTIME ADD PAGE — mobile form
+   OVERTIME MANAGEMENT + ADD PAGE
 ================================ */
-.overtime-screen{min-height:100vh;min-height:100dvh;padding:0 0 18px;background:#eef8f8;box-sizing:border-box;color:#211b52}
-.overtime-form-topbar{height:76px;background:#fff;display:grid;grid-template-columns:90px 1fr 90px;align-items:center;border-bottom:1px solid rgba(40,40,80,.06);padding:0 18px;box-sizing:border-box;position:relative}
-.overtime-form-topbar h1{margin:0;text-align:center;font-size:24px;font-weight:800;white-space:nowrap}
-.overtime-close-text{border:0;background:none;color:#211b52;font-size:16px;text-align:left;padding:0}
+.overtime-screen{min-height:100vh;min-height:100dvh;padding:0 0 96px;background:#eef8f8;box-sizing:border-box;color:#211b52}
+.overtime-manage-topbar{height:76px;background:#eef8f8;display:grid;grid-template-columns:52px 1fr 110px;align-items:center;padding:0 20px;box-sizing:border-box}
+.overtime-manage-topbar h1{margin:0;font-size:24px;font-weight:800;white-space:nowrap}
+.overtime-back-btn{border:0;background:none;color:#211b52;font-size:42px;line-height:1;padding:0;text-align:left}
+.overtime-month-nav{display:flex;align-items:center;justify-content:center;gap:22px;padding:6px 20px 22px}
+.overtime-month-nav button{width:46px;height:46px;border:2px solid #dfe4ec;border-radius:12px;background:#fff;color:#211b52;font-size:26px;line-height:1}
+.overtime-month-label{font-size:22px;font-weight:700;min-width:160px;text-align:center}
+.overtime-total-card{margin:0 20px 24px;background:#fff;border-radius:22px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;font-size:19px;box-shadow:0 2px 10px rgba(40,40,80,.03)}
+.overtime-total-card strong{font-size:21px;color:#211b52}
+.overtime-day-group{margin:0 20px 18px}
+.overtime-day-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:9px;color:#2670ff;font-size:18px;font-weight:700}
+.overtime-day-head .day-total{color:#39a84a;font-weight:500;white-space:nowrap}
+.overtime-day-card{background:#fff;border-radius:20px;overflow:hidden;border-left:7px solid #ffad00;box-shadow:0 2px 8px rgba(40,40,80,.025);cursor:pointer}
+.overtime-day-row{display:flex;justify-content:space-between;align-items:center;padding:20px 18px 12px;gap:10px}
+.overtime-day-row .muted-label{color:#a3a3b9;font-size:18px}
+.overtime-day-row strong{font-size:20px;color:#211b52}
+.overtime-day-meta{padding:0 18px 17px;color:#211b52;font-size:17px;display:flex;flex-direction:column;gap:12px}
+.overtime-day-meta .meta-line{display:flex;align-items:center;gap:10px}
+.overtime-day-meta .meta-icon{color:#9fa3b9;font-size:19px;width:18px;text-align:center}
+.overtime-day-meta .blue{color:#2670ff}
+.overtime-empty{text-align:center;color:#888;padding:45px 20px;font-size:17px}
+.overtime-add-fixed{position:fixed;left:20px;right:20px;bottom:18px;z-index:40;width:auto;min-height:58px;font-size:19px;border-radius:18px;box-shadow:0 6px 20px rgba(47,109,246,.2)}
+
+.overtime-add-screen{min-height:100vh;min-height:100dvh;background:#eef8f8;color:#211b52;padding-bottom:18px}
+.overtime-form-topbar{height:76px;background:#fff;display:grid;grid-template-columns:72px 1fr 72px;align-items:center;border-bottom:1px solid rgba(40,40,80,.06);padding:0 18px;box-sizing:border-box}
+.overtime-form-topbar h1{margin:0;text-align:center;font-size:23px;font-weight:800;white-space:nowrap}
+.overtime-close-text{border:0;background:none;color:#211b52;font-size:17px;text-align:left;padding:0}
 .overtime-form-body{padding:22px 20px 24px}
-.ot-form-label{font-size:18px;font-weight:700;margin:0 0 10px;color:#211b52}
-.ot-form-label em{font-style:normal;color:#ef4444}
+.ot-form-label{font-size:18px;font-weight:700;margin:0 0 10px;color:#211b52}.ot-form-label em{font-style:normal;color:#ef4444}
 .ot-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
 .ot-type-btn{min-height:76px;border:0;border-radius:16px;background:#fff;color:#211b52;font-size:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;box-shadow:0 2px 7px rgba(40,40,80,.03)}
-.ot-type-btn:first-child{font-size:15px}.ot-type-btn:first-child::first-line{font-size:28px}
 .ot-type-btn span{font-size:15px}.ot-type-btn.active{background:#2f6df6;color:#fff}
-.ot-picker-btn{width:100%;height:58px;border:2px solid #ffe3e7;border-radius:16px;background:#fff;color:#211b52;padding:0 20px;display:flex;align-items:center;justify-content:space-between;font-size:18px;font-weight:500;box-sizing:border-box}
-.ot-picker-btn span:last-child{font-size:25px}
-.ot-rate-label{margin-top:22px}
-.overtime-calc-info{background:#eeeaff;border-radius:16px;padding:13px 15px;margin-top:14px;color:#625c79;font-size:13px;line-height:1.5}
-.overtime-calc-info strong{color:#2670ff}
-.ot-date-row{display:grid;grid-template-columns:96px 1fr 96px;gap:10px;margin-bottom:22px}
-.ot-date-row button{height:58px;border:2px solid #ffe3e7;border-radius:16px;background:#fff;color:#211b52;font-size:25px}
-.ot-date-row .ot-date-main{font-size:18px}
+.ot-picker-btn{width:100%;height:58px;border:2px solid #ffe3e7;border-radius:16px;background:#fff;color:#211b52;padding:0 20px;display:flex;align-items:center;justify-content:space-between;font-size:18px;font-weight:500;box-sizing:border-box}.ot-picker-btn span:last-child{font-size:25px}
+.ot-rate-label{margin-top:22px}.overtime-calc-info{background:#eeeaff;border-radius:16px;padding:13px 15px;margin-top:14px;color:#625c79;font-size:14px;line-height:1.5}.overtime-calc-info strong{color:#2670ff}
 .ot-note-input{width:100%;height:96px;resize:none;border:2px solid #ffe3e7;border-radius:16px;background:#fff;padding:14px 16px;box-sizing:border-box;font:inherit;font-size:17px;color:#211b52;outline:none}
-.ot-save-area{border-top:1px solid rgba(40,40,80,.08);padding:14px 20px 0;background:#eef8f8}
-.ot-total-line{font-size:17px;margin:0 0 12px;color:#211b52}.ot-total-line strong{color:#2670ff;font-size:19px}
-.ot-save-btn{width:100%;min-height:58px;font-size:18px}
-.overtime-picker-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.34);z-index:200;display:flex;align-items:flex-end}
-.overtime-picker-sheet{width:100%;max-height:82vh;background:#fff;border-radius:28px 28px 0 0;padding:22px 18px 18px;box-sizing:border-box;box-shadow:0 -8px 30px rgba(0,0,0,.16)}
-.overtime-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.overtime-picker-head h2{margin:0;font-size:23px}.overtime-picker-head button{border:0;background:#f4f4f6;color:#8f9bb3;width:42px;height:42px;border-radius:50%;font-size:30px;line-height:1}
-.overtime-picker-options{max-height:62vh;overflow:auto;padding:0 0 4px}.overtime-picker-option{width:100%;min-height:58px;border:2px solid #e5e5ea;background:#f8f8fc;color:#211b52;border-radius:15px;margin-bottom:9px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;font-size:17px;text-align:left}.overtime-picker-option.selected{border-color:#2f6df6;background:#fff;color:#211b52}.overtime-picker-option span:last-child{width:27px;height:27px;border-radius:50%;border:2px solid #a4a5ba;display:flex;align-items:center;justify-content:center;color:#a4a5ba;font-size:16px}.overtime-picker-option.selected span:last-child{background:#2f6df6;border-color:#2f6df6;color:#fff}.overtime-picker-done{width:100%;margin-top:8px;min-height:56px;font-size:17px}
-@media(max-width:480px){.overtime-form-topbar{grid-template-columns:72px 1fr 72px;padding:0 16px}.overtime-form-topbar h1{font-size:22px}.overtime-form-body{padding:20px 18px 22px}.ot-form-label{font-size:17px}.ot-type-grid{gap:9px}.ot-date-row{grid-template-columns:72px 1fr 72px}.overtime-picker-sheet{padding-left:14px;padding-right:14px}}
+.ot-save-area{border-top:1px solid rgba(40,40,80,.08);padding:14px 20px 0;background:#eef8f8}.ot-total-line{font-size:17px;margin:0 0 12px;color:#211b52}.ot-total-line strong{color:#2670ff;font-size:19px}.ot-save-btn{width:100%;min-height:58px;font-size:18px}
+
+/* Lịch chọn ngày tăng ca — dùng cùng bố cục T2 → CN với lịch chấm công chính */
+.ot-calendar-wrap{background:#fff;border-radius:20px;padding:14px 12px;margin-top:4px;box-shadow:0 2px 8px rgba(40,40,80,.03)}
+.ot-calendar-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.ot-calendar-head strong{font-size:18px}.ot-calendar-head button{width:38px;height:38px;border:0;border-radius:11px;background:#f3f4f8;color:#211b52;font-size:23px}
+.ot-weekdays,.ot-calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.ot-weekdays span{text-align:center;font-size:12px;color:#8e91a5;font-weight:700;padding:3px 0}.ot-calendar-grid .ot-day{height:42px;border:0;border-radius:12px;background:#f6f7fa;color:#211b52;font-size:16px;position:relative}.ot-calendar-grid .ot-day.empty{background:transparent}.ot-calendar-grid .ot-day.weekend{color:#e05555}.ot-calendar-grid .ot-day.today{outline:2px solid #2670ff}.ot-calendar-grid .ot-day.has-ot{background:#eaf1ff;color:#2670ff;font-weight:700}.ot-calendar-grid .ot-day.selected{background:#2f6df6;color:#fff;font-weight:800}.ot-calendar-grid .ot-day .check{position:absolute;right:4px;top:1px;font-size:11px}.ot-calendar-grid .ot-day .ot-dot{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:#ffad00}
+
+.overtime-picker-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.34);z-index:200;display:flex;align-items:flex-end}.overtime-picker-sheet{width:100%;max-height:82vh;background:#fff;border-radius:28px 28px 0 0;padding:22px 18px 18px;box-sizing:border-box;box-shadow:0 -8px 30px rgba(0,0,0,.16)}.overtime-picker-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.overtime-picker-head h2{margin:0;font-size:23px}.overtime-picker-head button{border:0;background:#f4f4f6;color:#8f9bb3;width:42px;height:42px;border-radius:50%;font-size:30px;line-height:1}.overtime-picker-options{max-height:62vh;overflow:auto;padding:0 0 4px}.overtime-picker-option{width:100%;min-height:58px;border:2px solid #e5e5ea;background:#f8f8fc;color:#211b52;border-radius:15px;margin-bottom:9px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;font-size:17px;text-align:left}.overtime-picker-option.selected{border-color:#2f6df6;background:#fff;color:#211b52}.overtime-picker-option span:last-child{width:27px;height:27px;border-radius:50%;border:2px solid #a4a5ba;display:flex;align-items:center;justify-content:center;color:#a4a5ba;font-size:16px}.overtime-picker-option.selected span:last-child{background:#2f6df6;border-color:#2f6df6;color:#fff}.overtime-picker-done{width:100%;margin-top:8px;min-height:56px;font-size:17px}
+@media(max-width:480px){.overtime-manage-topbar{grid-template-columns:48px 1fr 96px;padding:0 16px}.overtime-manage-topbar h1{font-size:22px}.overtime-month-nav{gap:15px}.overtime-month-label{font-size:20px}.overtime-total-card{margin-left:16px;margin-right:16px}.overtime-day-group{margin-left:16px;margin-right:16px}.overtime-add-fixed{left:16px;right:16px}.overtime-form-body{padding:20px 18px 22px}.ot-form-label{font-size:17px}.ot-type-grid{gap:9px}.overtime-picker-sheet{padding-left:14px;padding-right:14px}}
 
 /* ==============================
    OVERTIME LOG
@@ -2140,50 +2156,53 @@ html, body{
 
 
     <div id="overtimeScreen" class="hidden screen-pad overtime-screen">
+        <div class="overtime-manage-topbar">
+            <button class="overtime-back-btn" type="button" onclick="closeOvertimeScreen()">‹</button>
+            <h1>Quản lý tăng ca</h1>
+            <span></span>
+        </div>
+        <div class="overtime-month-nav">
+            <button type="button" onclick="changeOvertimeMonth(-1)">‹‹</button>
+            <div id="overtimeManageMonth" class="overtime-month-label">Tháng 08/2026</div>
+            <button type="button" onclick="changeOvertimeMonth(1)">››</button>
+        </div>
+        <div id="overtimeManageTotal" class="overtime-total-card"><span>Tổng tiền tăng ca</span><strong>0 đ⌄</strong></div>
+        <div id="overtimeManageList"></div>
+        <button type="button" class="primary overtime-add-fixed" onclick="openOvertimeAddScreen()">Thêm mới</button>
+    </div>
+
+    <div id="overtimeAddScreen" class="hidden screen-pad overtime-add-screen">
         <div class="overtime-form-topbar">
-            <button class="overtime-close-text" type="button" onclick="closeOvertimeScreen()">Đóng</button>
+            <button class="overtime-close-text" type="button" onclick="closeOvertimeAddScreen()">Đóng</button>
             <h1>Thêm mới tăng ca</h1>
             <span></span>
         </div>
-
         <section class="overtime-form-body">
             <div class="ot-form-label">Loại tăng ca <em>*</em></div>
             <div class="ot-type-grid">
                 <button type="button" id="otTypeHourly" class="ot-type-btn active" onclick="setOvertimeEntryType('hourly')">◉<span>Tăng ca theo giờ</span></button>
                 <button type="button" id="otTypeManual" class="ot-type-btn" onclick="setOvertimeEntryType('manual')">✎<span>Nhập tiền thủ công</span></button>
             </div>
-
             <div id="hourlyOvertimeFields">
                 <div class="ot-form-label">Chọn số giờ tăng ca <em>*</em></div>
                 <button type="button" id="pageOtHoursPicker" class="ot-picker-btn" onclick="openOvertimeHoursPicker()"><span id="pageOtHoursText">0 giờ</span><span>⌄</span></button>
-
                 <div class="ot-form-label ot-rate-label">Chọn hệ số <em>*</em></div>
                 <button type="button" id="pageOtRatePicker" class="ot-picker-btn" onclick="openOvertimeRatePicker()"><span id="pageOtRateText">X1,5</span><span>⌄</span></button>
-
                 <div id="overtimeHourlyRateInfo" class="overtime-calc-info"></div>
             </div>
-
             <div id="manualOvertimeFields" class="hidden">
                 <div class="ot-form-label">Số tiền tăng ca <em>*</em></div>
                 <input id="pageOtManualMoney" class="settings-input money-input" inputmode="numeric" placeholder="Nhập số tiền">
             </div>
-
-            <div class="ot-form-label">Ngày tăng ca</div>
-            <div class="ot-date-row">
-                <button type="button" onclick="changeOvertimeEntryDate(-1)">‹‹</button>
-                <button type="button" class="ot-date-main" id="overtimeEntryDateLabel" onclick="openOvertimeDatePicker()">📅 Hôm nay</button>
-                <button type="button" onclick="changeOvertimeEntryDate(1)">››</button>
-            </div>
-
-            <div class="ot-form-label">Ghi chú</div>
+            <div class="ot-form-label" style="margin-top:22px">Chọn ngày tăng ca <em>*</em></div>
+            <div id="overtimeCalendarPicker" class="ot-calendar-wrap"></div>
+            <div class="ot-form-label" style="margin-top:20px">Ghi chú</div>
             <textarea id="pageOtNote" class="ot-note-input" placeholder=""></textarea>
         </section>
-
         <div class="ot-save-area">
             <div id="overtimePageTotal" class="ot-total-line">Tổng tiền tăng ca: <strong>0 đ</strong></div>
             <button type="button" class="primary ot-save-btn" onclick="savePageOvertime()">Lưu</button>
         </div>
-
         <div id="overtimePickerBackdrop" class="overtime-picker-backdrop hidden" onclick="closeOvertimePicker(event)">
             <div class="overtime-picker-sheet" onclick="event.stopPropagation()">
                 <div class="overtime-picker-head"><h2 id="overtimePickerTitle">Chọn loại tăng ca:</h2><button type="button" onclick="closeOvertimePicker()">×</button></div>
@@ -4590,11 +4609,12 @@ function openOvertimeQuickAdd(){
     document.getElementById("bottomBar")?.classList.add("hidden");
     document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
     window.scrollTo({top:0,left:0,behavior:"instant"});
-    renderOvertimeScreen();
+    renderOvertimeManagement();
 }
 
 function closeOvertimeScreen(){
     document.getElementById("overtimeScreen")?.classList.add("hidden");
+    document.getElementById("overtimeAddScreen")?.classList.add("hidden");
     const appShell=document.querySelector(".app");
     if(appShell) appShell.classList.remove("screen-only");
     document.getElementById("detailScreen")?.classList.remove("hidden");
@@ -4604,15 +4624,37 @@ function closeOvertimeScreen(){
     renderCalendar(); updateSummary(); updateMonthStats();
 }
 
+function openOvertimeAddScreen(){
+    if(!currentBoard) return;
+    document.getElementById("overtimeScreen")?.classList.add("hidden");
+    document.getElementById("overtimeAddScreen")?.classList.remove("hidden");
+    overtimeEditingDate=null;
+    const today=new Date();
+    overtimeCalendarYear=today.getFullYear();
+    overtimeCalendarMonth=today.getMonth();
+    overtimeEntryDate=dateKey(today.getFullYear(),today.getMonth(),today.getDate());
+    document.getElementById("pageOtManualMoney")?.setAttribute("value","");
+    window.scrollTo({top:0,left:0,behavior:"instant"});
+    renderOvertimeAddScreen();
+}
+
+function closeOvertimeAddScreen(){
+    document.getElementById("overtimeAddScreen")?.classList.add("hidden");
+    document.getElementById("overtimeScreen")?.classList.remove("hidden");
+    window.scrollTo({top:0,left:0,behavior:"instant"});
+    renderOvertimeManagement();
+}
+
 let overtimeEntryDate = null;
 let overtimeEntryType = "hourly";
+let overtimeEditingDate = null;
+let overtimeCalendarYear = new Date().getFullYear();
+let overtimeCalendarMonth = new Date().getMonth();
 
 function getOvertimeEntryDate(){
     if(overtimeEntryDate) return new Date(overtimeEntryDate + "T00:00:00");
-    const now=new Date();
-    return new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    return new Date();
 }
-
 function getOvertimeEntryKey(){
     const d=getOvertimeEntryDate();
     return dateKey(d.getFullYear(),d.getMonth(),d.getDate());
@@ -4627,50 +4669,69 @@ function setOvertimeEntryType(type){
     updateOvertimeEntryPreview();
 }
 
-function renderOvertimeScreen(){
+function renderOvertimeAddScreen(){
     if(!currentBoard) return;
-    const today=new Date();
-    if(!overtimeEntryDate) overtimeEntryDate=dateKey(today.getFullYear(),today.getMonth(),today.getDate());
     const key=getOvertimeEntryKey();
     const existing=currentBoard.attendance?.[key]||{};
     const hours=Math.max(0,Math.min(24,Math.round((Number(existing.overtimeHours)||0)*2)/2));
     const rate=Math.max(1,Math.min(10,Number(existing.overtimeRate)||Number(currentBoard.overtimeRate)||1.5));
-    const note=document.getElementById("pageOtNote");
-    if(note) note.value=existing.note||"";
-    const manual=document.getElementById("pageOtManualMoney");
-    if(manual) manual.value=existing.overtimeManualMoney?formatMoneyInputValue(existing.overtimeManualMoney):"";
+    const note=document.getElementById("pageOtNote"); if(note) note.value=existing.note||"";
+    const manual=document.getElementById("pageOtManualMoney"); if(manual) manual.value=existing.overtimeManualMoney?formatMoneyInputValue(existing.overtimeManualMoney):"";
     document.getElementById("pageOtHoursText").textContent=hours>0?formatHours(hours):"0 giờ";
     document.getElementById("pageOtRateText").textContent=`X${String(rate).replace(".",",")}`;
     overtimeEntryType=existing.overtimeManualMoney?"manual":"hourly";
     setOvertimeEntryType(overtimeEntryType);
-    updateOvertimeEntryDateLabel();
+    renderOvertimeCalendarPicker();
     updateOvertimeEntryPreview();
-    renderOvertimeHistoryIntoPage();
 }
 
-function updateOvertimeEntryDateLabel(){
-    const d=getOvertimeEntryDate();
-    const now=new Date();
-    const isToday=d.getFullYear()===now.getFullYear()&&d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
-    const el=document.getElementById("overtimeEntryDateLabel");
-    if(el) el.textContent=isToday?"📅 Hôm nay":`📅 ${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}/${d.getFullYear()}`;
+function changeOvertimeCalendarMonth(delta){
+    overtimeCalendarMonth+=delta;
+    if(overtimeCalendarMonth<0){overtimeCalendarMonth=11;overtimeCalendarYear--;}
+    if(overtimeCalendarMonth>11){overtimeCalendarMonth=0;overtimeCalendarYear++;}
+    renderOvertimeCalendarPicker();
 }
 
-function changeOvertimeEntryDate(delta){
-    const d=getOvertimeEntryDate(); d.setDate(d.getDate()+delta);
-    overtimeEntryDate=dateKey(d.getFullYear(),d.getMonth(),d.getDate());
-    renderOvertimeScreen();
+function selectOvertimeCalendarDate(day){
+    overtimeEntryDate=dateKey(overtimeCalendarYear,overtimeCalendarMonth,day);
+    overtimeEditingDate=overtimeEntryDate;
+    const record=currentBoard.attendance?.[overtimeEntryDate]||{};
+    const hours=Math.max(0,Math.min(24,Math.round((Number(record.overtimeHours)||0)*2)/2));
+    const rate=Math.max(1,Math.min(10,Number(record.overtimeRate)||Number(currentBoard.overtimeRate)||1.5));
+    const h=document.getElementById("pageOtHoursText"); if(h) h.textContent=hours>0?formatHours(hours):"0 giờ";
+    const r=document.getElementById("pageOtRateText"); if(r) r.textContent=`X${String(rate).replace(".",",")}`;
+    const note=document.getElementById("pageOtNote"); if(note) note.value=record.note||"";
+    const manual=document.getElementById("pageOtManualMoney"); if(manual) manual.value=record.overtimeManualMoney?formatMoneyInputValue(record.overtimeManualMoney):"";
+    overtimeEntryType=record.overtimeManualMoney?"manual":"hourly";
+    setOvertimeEntryType(overtimeEntryType);
+    renderOvertimeCalendarPicker();
 }
 
-function openOvertimeDatePicker(){
-    const value=overtimeEntryDate||dateKey(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());
-    const d=new Date(value+"T00:00:00");
-    const picked=prompt("Nhập ngày tăng ca (YYYY-MM-DD):",value);
-    if(!picked) return;
-    if(/^\d{4}-\d{2}-\d{2}$/.test(picked) && !Number.isNaN(new Date(picked+"T00:00:00").getTime())){
-        overtimeEntryDate=picked; renderOvertimeScreen();
+function renderOvertimeCalendarPicker(){
+    const root=document.getElementById("overtimeCalendarPicker");
+    if(!root) return;
+    const first=new Date(overtimeCalendarYear,overtimeCalendarMonth,1);
+    let start=first.getDay(); start=start===0?6:start-1;
+    const days=new Date(overtimeCalendarYear,overtimeCalendarMonth+1,0).getDate();
+    const today=new Date();
+    let html=`<div class="ot-calendar-head"><button type="button" onclick="changeOvertimeCalendarMonth(-1)">‹</button><strong>Tháng ${String(overtimeCalendarMonth+1).padStart(2,"0")}/${overtimeCalendarYear}</strong><button type="button" onclick="changeOvertimeCalendarMonth(1)">›</button></div>`;
+    html+=`<div class="ot-weekdays"><span>T2</span><span>T3</span><span>T4</span><span>T5</span><span>T6</span><span>T7</span><span>CN</span></div><div class="ot-calendar-grid">`;
+    for(let i=0;i<start;i++) html+=`<button type="button" class="ot-day empty"></button>`;
+    for(let day=1;day<=days;day++){
+        const key=dateKey(overtimeCalendarYear,overtimeCalendarMonth,day);
+        const date=new Date(overtimeCalendarYear,overtimeCalendarMonth,day);
+        const record=currentBoard.attendance?.[key]||{};
+        const hasOT=Number(record.overtimeHours)>0 || Number(record.overtimeManualMoney)>0;
+        const selected=key===overtimeEntryDate;
+        const isToday=date.getFullYear()===today.getFullYear()&&date.getMonth()===today.getMonth()&&date.getDate()===today.getDate();
+        const weekend=date.getDay()===0||date.getDay()===6;
+        html+=`<button type="button" class="ot-day ${weekend?"weekend ":""}${isToday?"today ":""}${hasOT?"has-ot ":""}${selected?"selected":""}" onclick="selectOvertimeCalendarDate(${day})">${day}${selected?`<span class="check">✓</span>`:""}${hasOT&&!selected?`<span class="ot-dot"></span>`:""}</button>`;
     }
+    html+=`</div>`;
+    root.innerHTML=html;
 }
+
+function openOvertimeDatePicker(){ renderOvertimeCalendarPicker(); }
 
 function openOvertimeHoursPicker(){
     const current=Number((document.getElementById("pageOtHoursText")?.textContent||"0").replace("giờ","").replace(",","."))||0;
@@ -4681,16 +4742,14 @@ function openOvertimeHoursPicker(){
         const moneyValue=getOvertimeHourlyRate()*h*getSelectedOvertimeRate();
         options.push(`<button type="button" class="overtime-picker-option ${h===current?"selected":""}" onclick="selectPageOvertimeHours(${h})"><span>${label} = ${money(moneyValue)}</span><span>✓</span></button>`);
     }
-    openOvertimePicker("Chọn loại tăng ca:",options.join(""));
+    openOvertimePicker("Chọn số giờ tăng ca:",options.join(""));
 }
-
 function openOvertimeRatePicker(){
     const current=getSelectedOvertimeRate();
     const rates=[1,1.5,2,2.5,3,3.5,4,5];
     const options=rates.map(rate=>`<button type="button" class="overtime-picker-option ${rate===current?"selected":""}" onclick="selectPageOvertimeRate(${rate})"><span>X${String(rate).replace(".",",")}</span><span>✓</span></button>`).join("");
     openOvertimePicker("Chọn hệ số:",options);
 }
-
 function openOvertimePicker(title,html){
     document.getElementById("overtimePickerTitle").textContent=title;
     document.getElementById("overtimePickerOptions").innerHTML=html;
@@ -4720,8 +4779,8 @@ function getOvertimeHourlyRate(){
     const salary=Number(currentBoard?.salary)||0;
     const standardDays=Math.max(1,Number(currentBoard?.standardDays)||26);
     const hoursPerDay=Math.max(1,Number(currentBoard?.hoursPerDay)||8);
-    const overtimeSalary=Number(currentBoard?.overtimeSalary)||salary;
-    return overtimeSalary/standardDays/hoursPerDay;
+    // Tiền theo giờ = lương chính / số công chuẩn / 8 giờ.
+    return salary/standardDays/hoursPerDay;
 }
 function updateOvertimeEntryPreview(){
     const info=document.getElementById("overtimeHourlyRateInfo");
@@ -4735,10 +4794,7 @@ function updateOvertimeEntryPreview(){
     }
     const rate=getSelectedOvertimeRate(), hours=getSelectedOvertimeHours(), hourly=getOvertimeHourlyRate();
     const amount=hours*hourly*rate;
-    const overtimeSalary=Number(currentBoard.overtimeSalary)||Number(currentBoard.salary)||0;
-    const standardDays=Math.max(1,Number(currentBoard.standardDays)||26);
-    const hoursPerDay=Math.max(1,Number(currentBoard.hoursPerDay)||8);
-    if(info) info.innerHTML=`Đơn giá tăng ca: <strong>${money(hourly)}</strong>/giờ · Mức tính: <strong>${money(overtimeSalary)}</strong>/tháng ÷ ${standardDays} công ÷ ${hoursPerDay} giờ.`;
+    if(info) info.innerHTML=`Tiền theo giờ: <strong>${money(hourly)}</strong>/giờ · Lương chính <strong>${money(Number(currentBoard.salary)||0)}</strong> ÷ ${Math.max(1,Number(currentBoard.standardDays)||26)} công ÷ ${Math.max(1,Number(currentBoard.hoursPerDay)||8)} giờ.`;
     if(total) total.innerHTML=`Tổng tiền tăng ca: <strong>${money(amount)}</strong>`;
 }
 
@@ -4756,42 +4812,62 @@ function savePageOvertime(){
         const status=Number(old.status)||0;
         if((status===3||status===4)&&hours>0){alert("Ngày nghỉ có lương/không lương không thể thêm tăng ca.");return;}
         if(!currentBoard.attendance) currentBoard.attendance={};
-        if(hours<=0){
-            if(old.status||note) currentBoard.attendance[key]={...old,overtimeHours:0,overtimeRate:rate,overtimeManualMoney:0,note};
-            else delete currentBoard.attendance[key];
-        }else currentBoard.attendance[key]={...old,status:old.status??0,overtimeHours:hours,overtimeRate:rate,overtimeManualMoney:0,note};
+        if(hours<=0){alert("Vui lòng chọn số giờ tăng ca.");return;}
+        currentBoard.attendance[key]={...old,status:old.status??0,overtimeHours:hours,overtimeRate:rate,overtimeManualMoney:0,note};
     }
-    saveData(); renderCalendar(); updateSummary(); updateMonthStats(); renderOvertimeScreen();
+    saveData(); renderCalendar(); updateSummary(); updateMonthStats(); closeOvertimeAddScreen();
 }
 
-function renderOvertimeHistoryIntoPage(){
+function changeOvertimeMonth(delta){
+    currentMonth+=delta;
+    if(currentMonth<0){currentMonth=11;currentYear--;}
+    if(currentMonth>11){currentMonth=0;currentYear++;}
+    renderCalendar(); updateSummary(); updateMonthStats(); renderOvertimeManagement();
+}
+
+function renderOvertimeManagement(){
+    if(!currentBoard)return;
     const monthPrefix=`${currentYear}-${String(currentMonth+1).padStart(2,"0")}-`;
     const salary=Number(currentBoard.salary)||0;
-    const standardDays=Number(currentBoard.standardDays)||26;
-    const hoursPerDay=Number(currentBoard.hoursPerDay)||8;
+    const standardDays=Math.max(1,Number(currentBoard.standardDays)||26);
+    const hoursPerDay=Math.max(1,Number(currentBoard.hoursPerDay)||8);
     const overtimeSalary=Number(currentBoard.overtimeSalary)||salary;
     const defaultRate=Number(currentBoard.overtimeRate)||1.5;
     const overtimeHourlyRate=overtimeSalary/standardDays/hoursPerDay;
     const records=[];
     Object.entries(currentBoard.attendance||{}).forEach(([date,record])=>{
-        if(!date.startsWith(monthPrefix)) return;
-        const hours=Number(record.overtimeHours)||0; if(hours<=0)return;
+        if(!date.startsWith(monthPrefix))return;
+        const hours=Number(record.overtimeHours)||0;
+        const manual=Number(record.overtimeManualMoney)||0;
+        if(hours<=0&&manual<=0)return;
         const rate=Math.max(1,Number(record.overtimeRate)||defaultRate);
-        const moneyValue=hours*overtimeHourlyRate*rate;
-        const dateObj=new Date(`${date}T00:00:00`);
-        const weekday=["Chủ nhật","Thứ 2","Thứ 3","Thứ 4","Thứ 5","Thứ 6","Thứ 7"][dateObj.getDay()];
-        records.push({date,weekday,hours,rate,money:moneyValue,note:record.note||""});
+        const moneyValue=manual>0?manual:hours*overtimeHourlyRate*rate;
+        const d=new Date(`${date}T00:00:00`);
+        const weekday=["CN","Th 2","Th 3","Th 4","Th 5","Th 6","Th 7"][d.getDay()];
+        const fullWeekday=["Chủ nhật","Thứ 2","Thứ 3","Thứ 4","Thứ 5","Thứ 6","Thứ 7"][d.getDay()];
+        records.push({date,weekday,fullWeekday,hours,rate,money:moneyValue,manual,note:record.note||""});
     });
-    records.sort((a,b)=>a.date.localeCompare(b.date));
-    const totalHours=records.reduce((sum,x)=>sum+x.hours,0);
-    const totalMoney=records.reduce((sum,x)=>sum+x.money,0);
-    const monthLabel=document.getElementById("overtimeMonthLabel");
-    if(monthLabel) monthLabel.textContent=`Tháng ${String(currentMonth+1).padStart(2,"0")}/${currentYear}`;
-    const summary=document.getElementById("overtimePageSummary");
-    if(summary) summary.innerHTML=`<div class="overtime-summary-row"><span>Tổng số giờ tăng ca</span><strong>${formatHours(totalHours)}</strong></div><div class="overtime-summary-row"><span>Tổng tiền tăng ca</span><strong>${money(totalMoney)}</strong></div>`;
-    const log=document.getElementById("overtimePageLog");
-    if(!log)return;
-    log.innerHTML=records.length?records.map(item=>`<div class="overtime-log-item" onclick="openDayDetail('${item.date}')"><div class="overtime-log-head"><div class="overtime-log-date">${formatDateVN(item.date)} · ${item.weekday}</div><div class="overtime-log-money">${money(item.money)}</div></div><div class="overtime-log-detail">Tăng ca: <strong>${formatHours(item.hours)}</strong> · Hệ số: <strong>X${String(item.rate).replace(".",",")}</strong></div>${item.note?`<div class="overtime-log-detail" style="margin-top:4px">Ghi chú: ${escapeHtml(item.note)}</div>`:""}</div>`).join(""):`<div class="transaction-empty">Chưa có ngày nào được chấm tăng ca trong tháng ${String(currentMonth+1).padStart(2,"0")}/${currentYear}.</div>`;
+    records.sort((a,b)=>b.date.localeCompare(a.date));
+    const total=records.reduce((sum,x)=>sum+x.money,0);
+    const monthLabel=document.getElementById("overtimeManageMonth"); if(monthLabel)monthLabel.textContent=`Tháng ${String(currentMonth+1).padStart(2,"0")}/${currentYear}`;
+    const totalEl=document.getElementById("overtimeManageTotal"); if(totalEl)totalEl.innerHTML=`<span>Tổng tiền tăng ca</span><strong>${money(total)}⌄</strong>`;
+    const list=document.getElementById("overtimeManageList"); if(!list)return;
+    if(!records.length){list.innerHTML=`<div class="overtime-empty">Chưa có dữ liệu tăng ca trong tháng ${String(currentMonth+1).padStart(2,"0")}/${currentYear}.</div>`;return;}
+    list.innerHTML=records.map(item=>{
+        const time=item.manual?"Tiền thủ công":formatHours(item.hours);
+        return `<div class="overtime-day-group"><div class="overtime-day-head"><span>▣ ${item.weekday}, ${formatDateVN(item.date)}</span><span class="day-total">+${money(item.money)}</span></div><div class="overtime-day-card" onclick="openOvertimeEdit('${item.date}')"><div class="overtime-day-row"><span class="muted-label">Số tiền</span><strong>${money(item.money)}</strong></div><div class="overtime-day-meta"><div class="meta-line"><span class="meta-icon">▣</span><span>${item.fullWeekday}, ${formatDateVN(item.date)}</span><span style="margin-left:auto;color:#b2b5c4">›</span></div><div class="meta-line"><span class="meta-icon">◷</span><span>Tổng thời gian: <span class="blue">${time}</span></span></div>${!item.manual?`<div class="meta-line" style="color:#777"><span></span><span>Hệ số: X${String(item.rate).replace(".",",")}</span></div>`:""}${item.note?`<div class="meta-line" style="color:#777"><span></span><span>Ghi chú: ${escapeHtml(item.note)}</span></div>`:""}</div></div></div>`;
+    }).join("");
+}
+
+function openOvertimeEdit(date){
+    if(!currentBoard)return;
+    const d=new Date(date+"T00:00:00");
+    overtimeEntryDate=date;
+    overtimeCalendarYear=d.getFullYear(); overtimeCalendarMonth=d.getMonth();
+    overtimeEditingDate=date;
+    document.getElementById("overtimeScreen")?.classList.add("hidden");
+    document.getElementById("overtimeAddScreen")?.classList.remove("hidden");
+    renderOvertimeAddScreen();
 }
 
 function saveQuickOvertime(key){
@@ -6011,7 +6087,7 @@ function loginWithFacebook(){alert("Đăng nhập Facebook chưa được kết 
    HOME / DATA / ACCOUNT
 ========================================= */
 function hideAppScreens(){
-    ["listScreen","detailScreen","dataScreen","accountScreen","exportScreen","transactionScreen","settingsScreen","overtimeScreen","annualLeaveScreen"].forEach(id=>document.getElementById(id)?.classList.add("hidden"));
+    ["listScreen","detailScreen","dataScreen","accountScreen","exportScreen","transactionScreen","settingsScreen","overtimeScreen","overtimeAddScreen","annualLeaveScreen"].forEach(id=>document.getElementById(id)?.classList.add("hidden"));
     document.getElementById("bottomBar")?.classList.add("hidden");
 }
 function navigateApp(screen){
