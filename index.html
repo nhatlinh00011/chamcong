@@ -4401,10 +4401,11 @@ function formatWorkDays(value){
 ========================================= */
 
 function money(value){
-    // Chỉ hiển thị phần nguyên của số tiền, bỏ phần lẻ phía sau.
-    // Ví dụ: 4.777.644,231 → 4.777.644 đ
-    const n = Math.floor(Number(value) || 0);
-    return n.toLocaleString("vi-VN") + " đ";
+
+    return Number(value)
+        .toLocaleString("vi-VN")
+        + " đ";
+
 }
 
 // Chuẩn hoá số tiền khi người dùng nhập: 2000000 → 2.000.000
